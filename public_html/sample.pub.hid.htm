@@ -1,0 +1,29 @@
+<div class="art-content-layout" id="design_db" >
+	<h3>Sample html code</h3>
+	<div style="display:inline-block" >
+		<h2 >Sample Unordered list</h2>
+		<ul>
+		<li>Lorep ipsum this val hala</li>
+		<li>Lorep ipsum this val hala.</li>
+		<li>Lorep ipsum this val hala.</li>		
+		</ul>
+		
+		<h2 >Sample Table</h2>
+		<table class="data odd_even_row_alternate_color" >
+		<thead><tr><th>field</th><th>type</th><th>description</th></tr></thead>
+		<tbody>
+			<tr><td>id</td><td>unsigned int</td><td>Primary key</td></tr>
+			<tr><td>firstname</td><td>varchar</td><td>Firstname of the user</td></tr>
+			<tr><td>lastname</td><td>varchar</td><td>Lastname of the user</td></tr>
+			<tr>
+				<td>role</td><td>int</td>
+				<td>Integer values corresponding to certain user roles tied to their rights. A value 0 is always the default assigned rule typically for unauthenticated user. Higher values means higher rights.
+				Details of rights are defined in app/model/Role.php.</td>
+			</tr>
+			<tr><td>salt</td><td>varchar</td><td>Salt in hashing the password</td></tr>
+			<tr><td>password</td><td>varchar</td><td>Hashed password</td></tr>
+			<tr><td>created</td><td>timestamp</td><td>Defaults to timestamp as db insertion</td></tr>
+		</tbody>
+		</table>
+	</div>
+</div>

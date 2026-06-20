@@ -1,0 +1,30 @@
+		if (isset($this->select_filters)) 
+		{
+			if (array_key_exists('role',$this->select_filters))
+			{
+				if (strlen(trim($this->select_filters['role']))==0)
+				{
+					unset($this->select_filters['role']);
+				}
+				else if ($this->select_filters['role']=='0')
+				{
+					unset($this->select_filters['role']);
+					$this->select_filters[]="(role < 1)";
+				}
+				else
+				{
+					$vals=array();
+					for($i=0;$i<=15;$i++)
+					{
+						if ($i & $this->select_filters['role'])
+						{
+							$vals[] = $i;
+						}
+					}
+					$this->select_filters['role']=$vals;
+				}
+				
+			}
+		}
+        
+        

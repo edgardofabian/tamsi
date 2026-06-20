@@ -1,0 +1,9 @@
+        $mysqli->query($sql);
+        if ($mysqli->error)
+        {
+            $_SESSION['tamsi_notice'].="Errormessage: ".$mysqli->error."  \r\n";
+            return false;
+        } 
+        $mysqli->close();
+        return true;
+        

@@ -1,0 +1,83 @@
+<?php 
+require_once 'Role.php';
+require_once '[CLASS_NAME].php';
+require_once '[CLASS_NAME]View.php'; 
+if (!isset($allowed_edit)) $allowed_edit=array("admin");
+if (!isset($allowed)) $allowed=array("admin");
+$role = new Role();
+if (!$role->isUserAnyOf($allowed))
+{
+	$role->showUnauthorizedMessage($allowed,"?command=display_php&base_path=usr/view&path=Edit_[CLASS_NAME].rest.php");
+} else
+{
+if (!isset($[TABLE_ELEMENT]_view))
+{
+	require_once '[CLASS_NAME]View.php'; 
+	$[TABLE_ELEMENT]_view = new [CLASS_NAME]View(); 
+	$[TABLE_ELEMENT]_view->init_edit();
+}
+
+if ($[TABLE_ELEMENT]_view->title)
+{
+    echo '<h2>'.$[TABLE_ELEMENT]_view->title.'</h2>';
+}
+?>
+
+[LINK_IMAGE]
+
+<form id="edit_[TABLE_ELEMENT]" <?php echo $[TABLE_ELEMENT]_view->form_attributes;?> class="edit" action="?command=edit&object=[CLASS_NAME]&base_path=<?php echo $_REQUEST["base_path"];?>&path=<?php echo $path;?>" method="POST">
+<input class="field_pages" field_pages="1" type="hidden" value="1" name="pages" />
+<?php $[TABLE_ELEMENT]_view->renderCsrf();?> 
+<?php $[TABLE_ELEMENT]_view->renderCustomEdit();?> 
+<?php if ($role->isUserAnyOf($allowed_edit)) { $[TABLE_ELEMENT]_view->renderEditControls(); }?>
+<table class='odd_even_row_alternate_color full_width data' >
+<thead><th><?php echo $[TABLE_ELEMENT]_view->field_header;?></th><th><?php echo $[TABLE_ELEMENT]_view->field_value_header;?><?php if ($role->isUserAnyOf($allowed_edit)) {?><button type='button' id='toggle_edit' class='button mx-'  mx-click='toggleEdit()'><li class='fa fa-pencil'></li> Enable Edit</button> <?php }?></th></thead>
+<tbody>
+<?php
+foreach($[TABLE_ELEMENT]_view->edit_columns as $field)
+{
+    $label = $[TABLE_ELEMENT]_view->columns[$field]['label'];
+    if (array_key_exists($field,$[TABLE_ELEMENT]_view->headers))
+    {
+		if (array_key_exists('label',$[TABLE_ELEMENT]_view->headers[$field]))
+		{
+			$label = $[TABLE_ELEMENT]_view->headers[$field]['label'];
+		}
+    }
+    if ($field=='id')
+    {?>
+        <tr id='tr_id' ><td class='label'><?php echo $label;?></td><td id='td_id' ><input type='number' style='display:none' name='id' value='<?php echo $[TABLE_ELEMENT]_view->[TABLE_ELEMENT]->getId();?>' ></input><?php echo $[TABLE_ELEMENT]_view->[TABLE_ELEMENT]->getId();?></td></tr>
+    <?php
+    } else if ($field=='password')
+    {?>
+        [PASSWORD]
+    <?php
+    } else 
+    {
+        echo "<tr id='tr_$field'><td class='label'>$label </td><td id='td_$field'>";
+        if (!isset($[TABLE_ELEMENT]_view->columns[$field]['attributes'])) 
+        {
+            $[TABLE_ELEMENT]_view->columns[$field]['attributes']=array();
+        }
+        if (!isset($[TABLE_ELEMENT]_view->columns[$field]['attributes']["placeholder"])) 
+        { 
+            $[TABLE_ELEMENT]_view->columns[$field]['attributes']=array("placeholder"=>"Type ");
+        }
+        
+        $render_func = 'render_'.$field; 
+        $[TABLE_ELEMENT]_view->$render_func();
+        
+        ?>
+        </td></tr>
+    <?php
+    }
+} ?>
+</tbody>
+</table>
+<div class="custom_widget">
+<?php if ($[TABLE_ELEMENT]_custom_widget) include "$[TABLE_ELEMENT]_custom_widget"; ?>
+</div>
+<?php if ($role->isUserAnyOf($allowed_edit)) { $[TABLE_ELEMENT]_view->renderEditControls(); }?>
+</form>
+<?php
+}?>

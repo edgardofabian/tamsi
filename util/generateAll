@@ -1,0 +1,25 @@
+sh generateMVC users link_image login_register
+#sh generateMVC documents link_image
+#sh generateMVC payments link_image
+#sh generateMVC services link_image
+#sh generateMVC sites link_image
+#sh generateMVC templates link_image
+sh generateMVC tickets link_image
+sh generateMVC ticket_discussions link_image
+
+#sh generateMCV appointments
+#sh generateMVC methods
+sh generateMVC questionnaires link_image
+sh generateMVC questions link_image
+sh generateMVC exams 
+sh generateMVC tasks
+sh generateMVC subjects
+sh generateMVC columns
+sh generateMVC courses
+sh generateMVC projects
+sh generateMVC configurations
+#sh generateMVC bunker_supplies
+#sh generateMVC informations
+#sh generateMVC specializations
+
+

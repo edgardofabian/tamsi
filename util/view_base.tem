@@ -1,0 +1,407 @@
+
+[DISTINCT_FIELDS_DECLARATION]
+   public function __construct($param=array('container'=>'div.page'))
+   {
+      foreach($param as $field=>$value)
+      {
+         $this->$field=$value;
+      }
+      if (!isset($this->container) || (!$this->container))
+      {
+         $this->container='div.page';
+      }
+      $this->paths = new Paths();
+      $this->config = new Configurations();
+      $this->current_user=new User();
+      $this->current_user->find(array("id"=>$_SESSION["user_id"]));
+
+        
+        
+[FIELD_PROPS]
+        $this->headers = [HEADERS];
+   } 
+    
+   public function setLabels($labels)
+   {
+      foreach($labels as $field=>$label)
+      {
+         if (array_key_exists($field,$this->columns) && array_key_exists('label',$this->columns[$field]))
+         {
+             $this->columns[$field]['label']=$label;
+         } else
+         if (array_key_exists($field,$this->headers))
+         {
+             $this->headers[$field]['label']=$label;
+         }
+         
+      }
+   }
+    
+    public function init_edit()
+    { 
+        $this->title = 'Edit [CLASS_NAME]';
+        $this->edit_columns = [FIELDS];
+
+        $this->security=new TamsiSecurity();
+        if (array_key_exists("id",$_GET))
+        {
+            $this->id=$_GET["id"];
+        } else
+        {
+            $this->id=$_REQUEST["id"];
+        }
+        $this->[TABLE_ELEMENT] = new [CLASS_NAME]();
+        $this->[TABLE_ELEMENT]->find(array("id"=>$this->id));
+        if ($_REQUEST)
+        {
+            if (array_key_exists("selected",$_REQUEST))
+            {
+                $this->page=$_REQUEST["selected"];
+            }
+            if (array_key_exists("path",$_REQUEST))
+            {
+                $this->page=$_REQUEST["path"];
+            }
+        }
+        $this->field_header = 'Field';
+        $this->field_value_header = 'Value';
+        $this->command = 'edit';
+        
+[EDIT_PROPS_BASE]
+        
+[EDIT_PROPS]
+        
+        
+    } 
+    public function init_new()
+    { 
+        $this->title = 'New [CLASS_NAME]';
+        $this->new_columns = [FIELDS];
+        
+        $this->security=new TamsiSecurity();
+        $this->[TABLE_ELEMENT] = new [CLASS_NAME]();
+        if ($_REQUEST)
+        {
+            if (array_key_exists("selected",$_REQUEST))
+            {
+                $this->page=$_REQUEST["selected"];
+            }
+            if (array_key_exists("path",$_REQUEST))
+            {
+                $this->page=$_REQUEST["path"];
+            }
+        }
+        $this->field_header = 'Field';
+        $this->field_value_header = 'Value';
+        $this->command = 'new';
+
+[NEW_PROPS_BASE]
+        
+[NEW_PROPS]
+        
+    } 
+    public function init_list_params()
+    { 
+        $this->security=new TamsiSecurity();
+        $valid_filters=[FIELDS];
+        if ($_REQUEST)
+        {
+            if (array_key_exists("[TABLE]_selected",$_REQUEST))
+            {
+                $this->page=$_REQUEST["[TABLE]_selected"];
+            }
+            if (array_key_exists("[TABLE]_path",$_REQUEST))
+            {
+                $this->path=$_REQUEST["[TABLE]_path"];
+            }
+        }
+        
+        if (!$this->container) $this->container='div.page';
+        $this->list_columns = array_merge(array('#','action'),$valid_filters);
+        $this->list_form_attributes='';
+        $this->custom_html_list='';
+        $this->command = 'list';
+        $this->list_controls = array('new'=>array('label'=>'New','url'=>'?command=display_rest&path=[ADMIN_DIR]/[CONTROLLER_NAME].dir/New_[CLASS_NAME].rest.php','container'=>$this->container));
+		$this->form_list='form_list_[TABLE]';
+		$this->action='?command=display_php&path=[ADMIN_DIR]/[CONTROLLER_NAME].dir/List_[CONTROLLER_NAME].rest.php';
+        $this->list_delete_button_url = '?command=deleteRest&object=[CLASS_NAME]'; //url of the controller where delete form will be submitted
+        $this->list_delete_button_next_url = '?command=display_rest&base_path=[ADMIN_DIR]/[CONTROLLER_NAME].dir&path=List_[CONTROLLER_NAME].rest.php';
+        $this->list_delete_selected_url = '?command=deleteSelectedRest&object=[CLASS_NAME]'; //url of the controller where delete of selected objects will be submitted
+        $this->enable_paginator = true;
+        $this->usr=array();
+        $[TABLE_ELEMENT] = new [CLASS_NAME]();
+[SORT_PREPROCESS]
+[FILTER_PREPROCESS]
+
+[FILTER_PROCESS]
+
+[SEARCH_TEXT]
+
+		$this->[TABLE_ELEMENT] = $[TABLE_ELEMENT];
+    }
+    
+    public function load_list()
+    { 
+[PAGINATION_PREPROCESS]
+        
+        $this->[TABLE] = $this->[TABLE_ELEMENT]->findAll($this->select_filters,$this->sort_filters,$this->items_per_page,$this->page);
+    }
+    
+    public function init_list()
+    { 
+        $this->title = '[CONTROLLER_NAME]';
+        $this->init_list_params();
+        $this->load_list();
+    } 
+    
+
+    public function renderDeleteCheckbox($[TABLE_ELEMENT])
+    {
+        echo '<input type="checkbox" class="select_checkbox" id="'.$[TABLE_ELEMENT]->getId().'" value="'.$[TABLE_ELEMENT]->getId().'" name="delete_selected[]" /><br>';
+    }
+    
+    public function renderEditAction($[TABLE_ELEMENT])
+    {
+        echo "<button type='button' class='mx- $class' mx-container='".$this->container."' mx-click='?command=display_rest&base_path=[ADMIN_DIR]/[CONTROLLER_NAME].dir&path=Edit_[CLASS_NAME].hid.rest.php&id=".$[TABLE_ELEMENT]->getId()."&object=[CLASS_NAME]' href='#' ><li class='fa fa-pencil'></li> edit</button>";
+    }
+    
+    public function renderSaveAction($next_url)
+    {
+        $mx_next_url='';
+        if ($next_url)
+        {
+            $mx_next_url = 'mx-next="'.$next_url.'"';
+        }
+        echo '<button type="button" class="button mx-" mx-click="'.$this->button_url.'"  href="#" mx-container="div.page" '.$mx_next_url.' ><li class="fa fa-save"></li> '.$this->button_name.'</button>';
+    }
+    
+    public function renderDeleteAction($[TABLE_ELEMENT],$next_url,$delete_url)
+    {
+        $mx_next_url='';
+        if ($next_url)
+        {
+            $mx_next_url = 'mx-next="'.$next_url.'"';
+        }
+        echo '<button type="button" class="button mx- danger" mx-confirm="Are you sure to delete [CLASS_NAME] of id='.$[TABLE_ELEMENT]->getId().'?" mx-click="'.$delete_url.'&id='.$[TABLE_ELEMENT]->getId().'" href="#" mx-container="'.$this->container.'" '.$mx_next_url.' ><li class="fa fa-trash" ></li> del</button>';
+    }
+    
+    public function renderViewAction($[TABLE_ELEMENT])
+    {
+        echo "<button type='button' class='mx- $class' mx-container='".$this->container."' mx-click='?command=display_rest&base_path=[ADMIN_DIR]/[CONTROLLER_NAME].dir&path=View_[CLASS_NAME].hid.rest.php&id=".$[TABLE_ELEMENT]->getId()."&object=[CLASS_NAME]' href='#' ><li class='fa fa-eye'></li> view</button>";
+    }
+
+    public function renderListAction()
+    {
+        echo "<button type='button' class='button mx- $class' mx-container='".$this->container."' mx-click='?command=display_rest&base_path=[ADMIN_DIR]/[CONTROLLER_NAME].dir&path=List_[CONTROLLER_NAME].rest.php&object=[CLASS_NAME]'  ><li class='fa fa-list'></li> List</button>";
+    }
+
+    public function renderActions($[TABLE_ELEMENT],$class="",$edit=TRUE)
+    {
+        if ($edit)
+        {
+            $this->renderDeleteCheckbox($[TABLE_ELEMENT]);
+            $this->renderEditAction($[TABLE_ELEMENT]);
+            $this->renderDeleteAction($[TABLE_ELEMENT],$this->list_delete_button_next_url,$this->list_delete_button_url);
+        } else
+        {
+            $this->renderViewAction($[TABLE_ELEMENT]);
+        }
+    }
+    
+	public function renderEditControls()
+    {
+		echo '<div class="control">';		
+		$this->renderSaveAction($this->button_next_url);
+        $this->renderDeleteAction($this->[TABLE_ELEMENT],$this->delete_button_next_url,$this->delete_button_url);
+        $this->renderListAction();
+		echo '</div>';
+	}    
+	
+	public function renderNewControls()
+	{
+        if ($this->button_next_url)
+        {
+            $next_after_create='mx-next="'.$this->button_next_url.'"';
+        } else
+        {
+            $next_after_create='';
+        }
+		echo '<div class="control" >';
+		echo '<button type="button" class="button mx-" mx-click="'.$this->button_url.'" href="#" '.$next_after_create.' mx-container="'.$this->container.'"><li class="fa fa-plus"></li> '.$this->button_name.' </button>';
+        $this->renderListAction();
+		echo '</div>';
+	}
+    
+   public function renderListControls($after_new='')
+   {
+      echo '<div class="control" >'."\r\n";
+      foreach($this->list_controls as $control)
+      {
+         echo '<button type="button" class="button mx-" mx-container="'.$control['container'].'" mx-click="'.$control['url'].'" href="#" ><i class="fa fa-plus"></i> '.$control['label'].'</button>'."\r\n";
+      }
+      echo '</div>'."\r\n";  
+   }
+
+   public function renderCustomEdit()
+   {
+   }
+
+   public function renderCustomNew()
+   {
+   }
+
+   public function renderCustomlist()
+   {
+   }
+    
+   public function get_icon($[TABLE_ELEMENT])
+   {
+		echo '<img class="icon" src="'.$this->paths->base_url.'/img/displaypng.php?id='.$_SESSION['user_id'].'&image='.$this->paths->user_image.'/[TABLE_NAME]/'.$[TABLE_ELEMENT]->getId().'_[TABLE_NAME]_icon.png&key='.$this->current_user->getSecurekey().'" />';
+   }
+   
+   public function render_icon_filter()
+   {
+      echo '';
+   }
+    
+    public function renderSearchText($field,$type)
+    {
+		echo '<div class="search_filter_header">';
+		$value='';
+		if (isset($this->search_texts) && array_key_exists($field,$this->search_texts)) $value=$this->search_texts[$field];
+		echo '<input class="search_text '.$type.'" type="text" name="[TABLE_NAME]_search_texts['.$field.']" value="'.$value.'"></input><button type="button" class="search_text_button clear" ><li class="fa fa-times"></li></button>';
+		echo '</div>';
+    }
+    
+    public function get_id($[TABLE_ELEMENT])
+    {
+        echo "<button type='button' class='mx-' mx-container='".$this->container."' mx-click='?command=display_rest&base_path=[ADMIN_DIR]/[CONTROLLER_NAME].dir&path=Edit_[CLASS_NAME].hid.rest.php&id=".$[TABLE_ELEMENT]->getId()."&object=[CLASS_NAME]'  ><i class='fa fa-edit'></i>".$[TABLE_ELEMENT]->getId()."</button>";
+    }
+    
+    public function renderPaginator()
+    {?>
+        <script>
+            <?php
+            if (!isset($this->container)) $this->container = 'div.page';
+            if (!isset($this->form_list)) $this->form_list = 'form_list_[TABLE]';
+            ?>
+            function [TABLE]_paginate(page) 
+            {
+                var form = $("#<?php echo $this->form_list;?>");
+                
+                var target = "<?php echo $this->container;?>";
+                
+                var url_submit = form.attr('action');        
+                var url = url_submit;
+                if (url_submit.indexOf('command=display_php')>=0)
+                {
+                    url = url_submit.replace('command=display_php','command=display_rest');
+                } 
+                
+                form.find('input.field_page').val(page);
+                form.find('input.field_items_per_page').val($('#[TABLE]_items_per_page').val());
+                if (typeof loadToSelector == 'function') 
+                { 
+                    loadToSelector(url,target,form,'',loader_img)
+                } else
+                {
+                    form.attr('action',url_submit);
+                    form.submit();
+                }
+                
+            }
+        </script>
+        <div class="paginator_container" >
+            <div class="column items_per_page" >
+                Show
+                <select name="[TABLE]_items_per_page" id="[TABLE]_items_per_page" style="width:60px" onchange="[TABLE]_paginate(<?php echo $this->page;?>)">
+                    <option class="entry-option" value="10" <?php echo (($this->items_per_page==10)?('selected="true"'):(''));?>>10</option>
+                    <option class="entry-option" value="25" <?php echo (($this->items_per_page==25)?('selected="true"'):(''));?>>25</option>
+                    <option class="entry-option" value="50" <?php echo (($this->items_per_page==50)?('selected="true"'):(''));?>>50</option>
+                    <option class="entry-option" value="100" <?php echo (($this->items_per_page==100)?('selected="true"'):(''));?>>100</option>
+                </select>
+                entries
+            </div>
+            <div class="column pages" >
+        <?php
+        if ($this->pages>1)
+        {
+            if (isset($this->table_only_paginator) && ($this->table_only_paginator))
+            {?>
+                    <ul class="table_only_paginitor">
+                        <?php if ($this->page>2) {?>
+                        <li class=""><button type="button" onclick="[TABLE]_paginate(1)">1</button></li>
+                        <?php } else
+                        {?>
+                        <li class="inactive">&nbsp;</li>		
+                        <?php
+                        }
+                        if ($this->page>1) {?>
+                        <li class="prev"><button type="button" onclick="[TABLE]_paginate(<?php echo ($this->page-1);?>)"><i class="fa fa-chevron-left"></i></button></li>
+                        <?php }
+                        else {
+                        ?>
+                        <li class="inactive"><i class="fa fa-chevron-left"></i></li>
+                        <?php }?>
+                        <li class="active"><?php echo $this->page;?></li>
+                        <?php
+                        if (($this->pages-$this->page)>0) {?>
+                        <li class="next"><button type="button" onclick="[TABLE]_paginate(<?php echo ($this->page+1);?>)"><i class="fa fa-chevron-right"></i></button></li>
+                        <?php
+                        } else {?>
+                        <li class="inactive"><i class="fa fa-chevron-right"></i></li>
+                        <?php
+                        }?>
+                        <?php
+                        if (($this->pages-$this->page)>1) {?>
+                        <li class="next"><button type="button" onclick="[TABLE]_paginate(<?php echo $this->pages;?>)"><?php echo $this->pages;?></button></li>
+                        <?php
+                        } else {?>
+                        <li class="inactive">&nbsp;</li>
+                        <?php
+                        }?>
+                   </ul>
+            <?php
+            } else 
+            {
+                ?>
+                <div align='center' class='paginator' style='' >
+                <input class='page_first first ' type='button' value='1' name='first' onclick='[TABLE]_paginate(1)' align='center'></input> 
+                <?php
+                if ($this->page>2)
+                {?>
+                    <input type='button'  value='<?php echo ($this->page-1);?>' name='prev_page' class='left ' onclick='[TABLE]_paginate(<?php echo ($this->page-1);?>)' align='center'></input>
+                <?php
+                } else
+                {?>
+                    <input type='button'  value='' name='page' class='left '  align='center'></input>
+                <?php
+                }?>
+                <input class='no_hover_effect center' type='button' disabled class='' value='<?php echo $this->page;?>'></input>
+                <?php
+                if ($this->page<$this->pages-1)
+                {?>
+                    <input class='page_next right' type='button' name='next_page' align='center' value='<?php echo ($this->page+1);?>' onclick='[TABLE]_paginate(<?php echo ($this->page+1);?>)' ></input>
+                <?php
+                } else
+                {?>
+                    <input class='page_next right' type='button' name='page' align='center' value=''  ></input>
+                <?php
+                }?>    
+                <input type='button' class='page_last last ' value='<?php echo $this->pages;?>'  name='last_page' onclick='[TABLE]_paginate(<?php echo $this->pages;?>)' align='center'></input>
+                <input type='hidden' page='1' name="current_page" />
+                </div>
+            <?php
+            }
+        }?>
+            </div>
+            <div class="column items" >
+                    <?php
+                    $start = ($this->page-1)*$this->items_per_page + 1;
+                    $end = $start+count($this->[TABLE])-1;
+                    ?>
+                    <div class="span5 dataTables_info" id="tableInfo">Showing <?php echo $start;?> to <?php echo $end;?> of <?php echo $this->total_db_items;?> entries</div>            
+            </div>
+        </div>
+<?php
+    }

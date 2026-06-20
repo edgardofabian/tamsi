@@ -1,0 +1,4 @@
+    <div class="search_filter_header">
+    <input class="search_text" type="text" name="[TABLE_NAME]_search_texts[[SEARCH_TEXT_FIELD]]" 
+    value="<?php if (isset($[VIEW_OBJECT]->search_texts) && array_key_exists('[SEARCH_TEXT_FIELD]',$[VIEW_OBJECT]->search_texts)) echo $[VIEW_OBJECT]->search_texts['[SEARCH_TEXT_FIELD]'];?>"></input><button type="button" class="search_text_button" ><li class="fa fa-search"></li></button>
+    </div>

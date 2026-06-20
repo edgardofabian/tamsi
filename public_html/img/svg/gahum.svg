@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="50" height="50" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="25" cy="25" rx="25" ry="25" fill="lightgreen"  />
+    <ellipse cx="25" cy="25" rx="22" ry="22" fill="white"  />    
+    <ellipse cx="25" cy="25" rx="20" ry="8" fill="lightgreen"  />
+    <ellipse cx="25" cy="25" rx="18" ry="6" fill="white"  />
+    <ellipse cx="25" cy="25" rx="6" ry="6" fill="green"  />
+</svg>

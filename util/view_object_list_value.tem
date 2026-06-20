@@ -1,0 +1,4 @@
+    public function get_[DATA]($[TABLE_ELEMENT])
+    {
+        [GET_VALUE];
+    }

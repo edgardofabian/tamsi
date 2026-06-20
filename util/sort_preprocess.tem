@@ -1,0 +1,48 @@
+        if (!isset($_SESSION['list_[TABLE_NAME]']))
+        {
+            $_SESSION['list_[TABLE_NAME]']=array();
+            $_SESSION['list_[TABLE_NAME]']['sort_filters']=array();
+            $_SESSION['list_[TABLE_NAME]']['sort_order']='';
+            $_SESSION['list_[TABLE_NAME]']['select_filters']=array();
+            $_SESSION['list_[TABLE_NAME]']['search_texts']=array();
+            $_SESSION['list_[TABLE_NAME]']['page']='1';
+        }
+
+        if (isset($_REQUEST['[TABLE_NAME]_sort_filters']))
+        {
+            $sort_lists = $_REQUEST['[TABLE_NAME]_sort_filters'];
+            $_SESSION['list_[TABLE_NAME]']['sort_filters']=$sort_lists;
+        }
+        else
+        {
+            $sort_lists=$_SESSION['list_[TABLE_NAME]']['sort_filters'];
+        }
+
+        if (isset($_REQUEST['[TABLE_NAME]_sort_order']))
+        {
+            $sort_order = $_REQUEST['[TABLE_NAME]_sort_order'];
+            $_SESSION['list_[TABLE_NAME]']['sort_order']=$sort_order;
+        }
+        else
+        {
+            $sort_order = $_SESSION['list_[TABLE_NAME]']['sort_order'];
+        }
+        
+        if (!$sort_lists) 
+        {
+            $sort_lists = array('id'=>'DESC');
+            $sort_order = 'id';
+        }
+        
+        $this->sort_filters = array();
+        if (is_array($sort_order))
+        {
+            $this->sort_orders = $sort_order;
+        } else if (is_string($sort_order))
+        {
+            $this->sort_orders = explode(',',$sort_order);
+            foreach ($this->sort_orders as $s_order)
+            {
+                $this->sort_filters[$s_order]=$sort_lists[$s_order];
+            }
+        } else $this->sort_orders = array();

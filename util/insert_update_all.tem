@@ -1,0 +1,4 @@
+    public  function insertUpdateAll($[TABLE],$fields_array=array([FIELDS_ARRAY]),$key='id')
+    {
+        return parent::insertUpdateAll($[TABLE],$fields_array,$key);
+    }

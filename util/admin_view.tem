@@ -1,0 +1,4 @@
+<?php
+$allowed_edit=array();
+include __DIR__.'/../../usr/view/[TABLE]/[FILENAME]';
+

@@ -1,0 +1,75 @@
+    public function render_[DATA]()
+    {
+        if ($this->[TABLE_ELEMENT]->getType())
+        {
+            $type_obj = $this->[TABLE_ELEMENT]->getTypeObjectName();
+            require_once $type_obj.'.php';
+            $val=($this->[TABLE_ELEMENT]->get[DATA_FUNCTION_NAME]())?htmlentities($this->[TABLE_ELEMENT]->get[DATA_FUNCTION_NAME]()):'';
+            $[TABLE_ELEMENT]_field='[DATA]';
+            if ($this->columns[$[TABLE_ELEMENT]_field]['type']=='boolean')
+            {
+                $this->render_boolean($[TABLE_ELEMENT]_field,$val);
+            }
+            else if (($this->columns[$[TABLE_ELEMENT]_field]['type']=='hidden') || ($this->columns[$[TABLE_ELEMENT]_field]['type']=='readonly'))
+            {   
+                echo "<input type='hidden' name='[DATA]'  value='$val' />";
+                if ($this->columns[$[TABLE_ELEMENT]_field]['type']=='readonly')
+                {
+                    $foreign_table = new $type_obj();
+                    $obj=$foreign_table->find(array("id"=>$val));
+                    echo "<span >".$obj->getName()."</span>";
+                }
+            } else
+            {
+                if ($this->columns[$[TABLE_ELEMENT]_field]['mode']=='edit')
+                {
+                    echo "<select class='chosen edit_input' $readonly name='[DATA]'>\n";
+                } else
+                {
+                    echo "<select class='chosen' $readonly name='[DATA]'>\n";
+                }
+                $selected_ids=array();
+                if ($val)
+                {
+                    $selected_ids = explode(",",$val);
+                }
+                $foreign_table = new $type_obj();
+                
+                $param=array();
+                if (array_key_exists('option_filters',$this->columns[$[TABLE_ELEMENT]_field]) && $this->columns[$[TABLE_ELEMENT]_field]['option_filters'])
+                {
+                    $param['filter'] = $this->columns[$[TABLE_ELEMENT]_field]['option_filters'];
+                }
+                if (array_key_exists('option_sort',$this->columns[$[TABLE_ELEMENT]_field]) && $this->columns[$[TABLE_ELEMENT]_field]['option_sort'])
+                {
+                    $param['sort'] = $this->columns[$[TABLE_ELEMENT]_field]['option_sort'];
+                }
+                if (array_key_exists('option_select',$this->columns[$[TABLE_ELEMENT]_field]) && $this->columns[$[TABLE_ELEMENT]_field]['option_select'])
+                {
+                    $param['select'] = $this->columns[$[TABLE_ELEMENT]_field]['option_select'];
+                }    
+                
+                $objs=$foreign_table->getAll($param);                                
+                $data_names = array();
+                foreach ($objs as $option)
+                {
+                    $name = $option->getName();
+                    $oid = $option->getId();
+                    if ($oid)
+                    {
+                        if (in_array($oid,$selected_ids))
+                        {
+                            echo "<option selected='selected' value='$oid' >$name</option>\n";
+                            $data_names[] = $name;
+                        } else
+                        {
+                            echo "<option value='$oid' >$name</option>\n";
+                        }
+                    }
+                }
+                echo "</select>\n";
+                if ($this->columns[$[TABLE_ELEMENT]_field]['mode']=='edit') echo "<span class='view_input'>".implode(',',$data_names)."</span>";
+            }
+        }
+    }
+

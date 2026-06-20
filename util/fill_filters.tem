@@ -1,0 +1,10 @@
+        $this->distinct_[DISTINCT_FIELD]_lst=array();
+
+		$res = $[TABLE_ELEMENT]->query('SELECT DISTINCT [DISTINCT_FIELD] from [TABLE]');
+
+        foreach ($res as $item)
+        {
+			$[DISTINCT_FIELD]=$item['[DISTINCT_FIELD]'];
+			$this->distinct_[DISTINCT_FIELD]_lst[$[DISTINCT_FIELD]]=$[DISTINCT_FIELD];
+        }
+

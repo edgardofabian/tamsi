@@ -1,0 +1,5 @@
+#rsync -zvurl -e "ssh -p 65002" /mnt/sg4tera_important/projects/gahum/school/usr_generated u635010524@185.232.14.1:domains/gahum.tech/school/   --exclude=.git --exclude=util --exclude=view_bak --exclude=model_bak --exclude=controller_bak --exclude=config --exclude=vendor --exclude=js --exclude=old --exclude=db_util/db_util.cfg.local.php
+rsync -zvurl -e "ssh -p 65002" ../../public_html/school/img/. u597219769@191.96.56.198:domains/gahum.net/public_html/school/img/   --exclude=.git --exclude=util --exclude=view_bak --exclude=model_bak --exclude=controller_bak --exclude=config --exclude=vendor --exclude=js --exclude=old --exclude=db_util/db_util.cfg.local.php
+#rsync -zvurl -e "ssh -p 65002" ../../public_html/school/img/clf/. u635010524@185.232.14.134:domains/gahum.tech/public_html/school/img/clf/   --exclude=.git --exclude=util --exclude=view_bak --exclude=model_bak --exclude=controller_bak --exclude=config --exclude=vendor --exclude=js --exclude=old --exclude=db_util/db_util.cfg.local.php
+
+

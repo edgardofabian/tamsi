@@ -1,0 +1,89 @@
+    public function googleLoginActionGet()
+    {
+        // create Client Request to access Google API
+        $client = new Google_Client();
+        $client->setClientId(GOOGLE_CLIENT_ID);
+        $client->setClientSecret(GOOGLE_CLIENT_SECRET);
+        $client->setRedirectUri(GOOGLE_REDIRECT_URL);
+        $client->addScope("email");
+        $client->addScope("profile");
+        $user = new User();
+        $role = new Role();
+        $msg='';
+        if ($role->isUserLoggedIn())
+        {
+            $paths = new Paths();
+            return $paths->home;                
+        }
+        $email='';
+        $secure = new Secure_config();
+        
+        // authenticate code from Google OAuth Flow
+        if (isset($_GET['code'])) 
+        {
+            try
+            {
+                $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+                $client->setAccessToken($token['access_token']);
+
+                // get profile info
+                $google_oauth = new Google_Service_Oauth2($client);
+                $google_account_info = $google_oauth->userinfo->get();
+                $email =  $google_account_info->email;
+                $name =  $google_account_info->name;
+
+                
+                $user->find(array('email'=>$email));
+                
+                if ($user->getId()==0)
+                {
+                    $user->setEmail($google_account_info->email);
+                    $user->setFirstname($google_account_info->given_name);
+                    $user->setLastname($google_account_info->family_name);
+                }
+                
+            } catch (Exception $e) 
+            {
+                $msg='Caught exception: '.$e->getMessage()."\n";
+            }
+            if ($user->getId())
+            {
+                $[TABLE_ELEMENT]=$this->login($[TABLE_ELEMENT],$secure);
+                $paths = new Paths();
+                header("Location: ".$paths->base_url);
+                exit(); 
+            } else
+            {
+                if (($email) && (defined('GOOGLE_REGISTRATION_ROLE')))
+                {
+                    $[TABLE_ELEMENT]->setRole($role->getValueFromName(GOOGLE_REGISTRATION_ROLE));
+                    
+                    $[TABLE_ELEMENT]=$this->login($[TABLE_ELEMENT],$secure);
+                    $_SESSION['tamsi_notice']='Your email '.$email.' does not exist in our system. So we are registering you as '.GOOGLE_REGISTRATION_ROLE.'. Pls fill your profile and password.';
+                    
+                    $paths = new Paths();
+                    $_GET['id']=$user->getId();
+                    return $paths->admin.'/Users.dir/Edit User.hid.rest.php';
+                }
+                else
+                {
+                    $_SESSION['tamsi_notice']='Invalid Credentials! :'.$msg;
+                    $_SESSION['user_id']=0;
+                    $_SESSION['user_name']='';
+                    $_SESSION['user_email']='';
+                    $_SESSION['user_role']='';
+                    $_SESSION['user_domain']='';
+                    $_SESSION['site_map']='';
+                }
+            }        
+        }
+        else
+        {
+            if (array_key_exists('google',$_GET) && $_GET['google'])
+            {
+                header('Location:'.$client->createAuthUrl());
+                exit;
+            }
+        }
+        
+    }

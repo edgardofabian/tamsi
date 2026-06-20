@@ -1,0 +1,245 @@
+<?php
+require_once '[CLASS_NAME].php';
+require_once '[CLASS_NAME]View.php';
+require_once 'Role.php'; 
+if (!isset($allowed)) $allowed=array("admin");
+if (!isset($allowed_edit)) $allowed_edit=array("admin");
+$role = new Role();
+if (!$role->isUserAnyOf($allowed))
+{
+
+	$role->showUnauthorizedMessage($allowed,"?command=display_php&base_path=usr/view&path=List_[CONTROLLER_NAME].rest.php");
+} else
+{
+if (!isset($[TABLE_ELEMENT]_view)) 
+{ 
+    $[TABLE_ELEMENT]_view = new [CLASS_NAME]View();
+    $[TABLE_ELEMENT]_view->init_list();
+    
+} 
+$[TABLE_ELEMENT]_view->table_only_paginator=true;
+ if (!isset($headers)) $headers = [HEADERS];
+ $theaders=array();
+ foreach($headers as $name)
+ {
+   if (array_key_exists($name,$[TABLE_ELEMENT]_view->headers))
+   {
+       $theaders[$name]=$[TABLE_ELEMENT]_view->headers[$name];
+   } else 
+   {
+       $theaders[$name]=array("label"=>"#","sort"=>0,"class"=>"","attributes"=>array());
+   }
+ }
+ if (array_key_exists("[TABLE]_container",$_REQUEST)) $[TABLE_ELEMENT]_view->container = $_REQUEST["[TABLE]_container"];
+?>
+<form id='<?php echo $[TABLE_ELEMENT]_view->form_list;?>' <?php echo $[TABLE_ELEMENT]_view->list_form_attributes;?> class="form list" action="<?php echo $[TABLE_ELEMENT]_view->action;?>" method="POST">
+<input type='hidden' name='[TABLE]_container' value='<?php echo $[TABLE_ELEMENT]_view->container;?>' />
+<?php $[TABLE_ELEMENT]_view->renderCsrf();?>
+<?php $[TABLE_ELEMENT]_view->renderCustomList();?>
+<?php echo $[TABLE_ELEMENT]_view->custom_html_list;?>
+<table class='odd_even_row_alternate_color full_width data' >
+<input class='field_pages' field_pages='<?php echo $[TABLE_ELEMENT]_view->pages; ?>' type='hidden' value='<?php echo $[TABLE_ELEMENT]_view->pages; ?>' name='[TABLE]_pages' />
+<input class='field_page' field_page='<?php echo $[TABLE_ELEMENT]_view->page; ?>' type='hidden' value='<?php echo $[TABLE_ELEMENT]_view->page; ?>' name='[TABLE]_page' /> 
+<input class='field_items_per_page' field_items_per_page='<?php echo $[TABLE_ELEMENT]_view->items_per_page; ?>' type='hidden' value='<?php echo $[TABLE_ELEMENT]_view->items_per_page; ?>' name='[TABLE]_items_per_page' /> 
+<?php $[TABLE_ELEMENT]_view->renderListControls(); ?>
+
+<thead><tr><?php 
+foreach($theaders as $vfield=>$vhead) { ?>
+<th id="header_<?php echo $vfield;?>"  field="<?php echo $vfield;?>"> <?php echo ($vhead["sort"]?("<button class='toggle_sort fa fa-sort' type='button'> ".$vhead["label"]."</button>"):$vhead["label"]);?> <?php echo ($vhead["sort"]?("<input id='[TABLE]_sort_".$vfield."' type='hidden' field='".$vfield."' class='sort' name='[TABLE]_sort_filters[$vfield]' value='".($[TABLE_ELEMENT]_view->sort_filters[$vfield])."' style='display:none;'>"):"");?> </th>
+<?php } ?></tr>
+<tr><?php 
+foreach($theaders as $vfield=>$vhead) { 
+if ($vfield=="#") { echo "<th></th>"; } else 
+if ($vfield=="action") { echo "<th><button id=\"[TABLE]_clear_search_and_sort\" type=\"button\" class=\"button\"><i class=\"fa fa-times\"></i> <span style=\"color:#DDDDDD;text-shadow:none\"><i class=\"fa fa-sort\"><i class=\"fa fa-search\"></span></button></th>"; } else { 
+$filter_td_func= "render_".$vfield."_filter"; ?>
+<th> <?php if (method_exists($[TABLE_ELEMENT]_view,$filter_td_func)) { $[TABLE_ELEMENT]_view->$filter_td_func();}?> </th>
+<?php    } ?>
+<?php } ?></tr></thead>
+<tbody>
+ <?php
+    $current_user=new User();
+    $id = $_SESSION["user_id"];
+    $current_user=$current_user->find(array("id"=>$id));
+    $i=($[TABLE_ELEMENT]_view->page-1)*$[TABLE_ELEMENT]_view->item_per_page;
+    foreach ($[TABLE_ELEMENT]_view->[TABLE] as $[TABLE_ELEMENT])
+    { 
+        $i=$i+1;
+        $path_edit = "Edit [CLASS_NAME]";
+        $item_num = ($[TABLE_ELEMENT]_view->page-1)*$[TABLE_ELEMENT]_view->items_per_page+$i;
+?>
+<tr class="id_<?php echo $[TABLE_ELEMENT]->getId(); ?>" ><?php 
+foreach($theaders as $vfield=>$vhead) { 
+if ($vfield=="#") { echo "<td>".$item_num."</td>"; } else 
+if ($vfield=="action") { ?>
+<td><?php $[TABLE_ELEMENT]_view->renderActions($[TABLE_ELEMENT],"",$role->isUserAnyOf($allowed_edit));?></td> <?php } else { 
+$get_td_func= "get_".$vfield; ?>
+<td> <?php if (method_exists($[TABLE_ELEMENT]_view,$get_td_func)) { $[TABLE_ELEMENT]_view->$get_td_func($[TABLE_ELEMENT]); }?> </td>
+<?php   }  
+} ?>
+<?php } ?>
+</tbody>
+</table><input class="sort_order" type="hidden" name="[TABLE]_sort_order" value="" />
+</form>
+<?php 
+    $[TABLE_ELEMENT]_view->renderPaginator();
+?>
+<?php $[TABLE_ELEMENT]_view->renderListControls(); ?>
+<script>
+$(document).ready(function() 
+{
+    var container = '<?php echo $[TABLE_ELEMENT]_view->container;?>';
+    var form_list = '<?php echo $[TABLE_ELEMENT]_view->form_list;?>';
+    var sort_filters = [<?PHP 
+                        $i=0;
+                        foreach ($[TABLE_ELEMENT]_view->sort_orders as $order) 
+                        {
+                            if ($i==0)
+                            {
+                                echo "'$order'";
+                            } else echo ",'$order'";
+                            $i=$i+1;
+                        }?>];
+    $('#'+form_list+' input.sort_order').val(sort_filters.toString());
+    $('#<?php echo $[TABLE_ELEMENT]_view->form_list;?>').find('.toggle_sort').each( function()
+    {
+        //alert('loading '+$(this).attr('id'));
+        var sort_handle = $(this).closest('th').find('input.sort');
+        if (sort_handle.val()=='ASC')
+        {
+            $(this).removeClass('fa-sort-desc');
+            $(this).removeClass('fa-sort');
+            $(this).addClass('fa-sort-asc');
+        } else if (sort_handle.val()=='DESC')
+        {
+            $(this).removeClass('fa-sort-asc');
+            $(this).removeClass('fa-sort');
+            $(this).addClass('fa-sort-desc');
+        } else
+        {
+            $(this).removeClass('fa-sort-desc');
+            $(this).removeClass('fa-sort-asc');
+            $(this).addClass('fa-sort');                
+        }        
+        $(this).click( function()
+        {
+            var sort_handle = $(this).closest('th').find('input.sort');
+            if ($(this).hasClass('fa-sort-asc'))
+            {
+                sort_handle.val('DESC');
+            } else
+            if ($(this).hasClass('fa-sort-desc'))
+            {
+                sort_handle.val('');
+            } else
+            if ($(this).hasClass('fa-sort'))
+            {
+                sort_handle.val('ASC');             
+            }
+
+
+            if (sort_handle.hasClass('sort'))
+            {
+                var index = sort_filters.indexOf(sort_handle.attr('field'));
+                if (index>=0)
+                {
+                    sort_filters.splice(index, 1);
+                } 
+                if ((sort_handle.val()=='ASC')||(sort_handle.val()=='DESC'))
+                {
+                    sort_filters.unshift(sort_handle.attr('field'));
+                }
+            }
+            if (sort_filters.length>0)
+            {
+                $('#'+form_list+' input.sort_order').val(sort_filters.toString());
+            }
+            
+            var page=parseInt($('#'+form_list+' input.field_page').val());
+            var url=$('#'+form_list).attr('action')+'&page='+page+'&sort_order='+$('#'+form_list+' input.sort_order').val();
+            var url_rest = url.replace('display_php','display_rest');
+            loadToSelector(url_rest,container,'#'+form_list,'',loader_img);
+            
+        });
+    });
+    $('#'+form_list).find('select.filter').each( function()
+    {
+        $(this).change( function()
+        {
+            if (sort_filters.length>0)
+            {
+                $('#'+form_list+' input.sort_order').val(sort_filters.toString());
+            }
+
+            var page=parseInt($('#'+form_list+' input.field_page').val());
+            var url=$('#'+form_list).attr('action')+'&page='+page+'&sort_order='+$('#'+form_list+' input.sort_order').val();
+            var url_rest = url.replace('display_php','display_rest');
+            loadToSelector(url_rest,container,'#'+form_list,'',loader_img);
+            
+        });
+    });    
+	$('#'+form_list).find('.search_text_button').each( function()
+    {
+        $(this).click( function()
+        {
+            if (sort_filters.length>0)
+            {
+                $('#'+form_list+' input.sort_order').val(sort_filters.toString());
+            }
+
+            var page=parseInt($('#'+form_list+' input.field_page').val());
+            var url=$('#'+form_list).attr('action')+'&page='+page+'&sort_order='+$('#'+form_list+' input.sort_order').val();
+            var url_rest = url.replace('display_php','display_rest');
+            loadToSelector(url_rest,container,'#'+form_list,'',loader_img);
+            
+        });
+    });   
+    $("#[TABLE]_clear_search_and_sort").click( function()
+    {
+        $("#"+form_list+" table.data").find("input.search_text").each( function()
+        {
+            $(this).val("");
+        });
+        $("#"+form_list+" table.data").find("select.filter").each( function()
+        {
+            $(this).val("");
+        });			
+        $("#"+form_list+" table.data").find("input.sort").each( function()
+        {
+            $(this).val("");
+        });
+        $("#"+form_list+" table.data").find("a.toglle_sort").each( function()
+        {
+            if ($(this).hasClass("fa-sort-asc"))
+            {
+                $(this).removeClass("fa-sort-asc");
+            }
+            if ($(this).hasClass("fa-sort-desc"))
+            {
+                $(this).removeClass("fa-sort-desc");
+            }
+            if ($(this).hasClass("fa-sort"))
+            {
+            
+            }
+            else
+            {
+                $(this).addClass("fa-sort-asc");
+            }
+            
+            $(this).removeClass("fa-sort-asc");
+        });
+        
+        if (sort_filters.length>0)
+        {
+            $('#'+form_list+' input.sort_order').val(sort_filters.toString());
+        }
+
+        var page=parseInt($('#'+form_list+' input.field_page').val());
+        var url=$('#'+form_list).attr('action')+'&page='+page+'&sort_order='+$('#'+form_list+' input.sort_order').val();
+        var url_rest = url.replace('display_php','display_rest');
+        loadToSelector(url_rest,container,'#'+form_list,'',loader_img);        
+    });         
+});
+</script>
+<?php
+}?>

@@ -1,0 +1,150 @@
+    public function facebookLoginActionGet()
+    {
+        $fb = new Facebook\Facebook([
+          'app_id' => FACEBOOK_CLIENT_ID,
+          'app_secret' => FACEBOOK_CLIENT_SECRET,
+          'default_graph_version' => 'v2.10',
+          ]);
+
+        $helper = $fb->getRedirectLoginHelper();
+
+        $permissions = ['email']; // Optional permissions
+        $fb_login_url = $helper->getLoginUrl(FACEBOOK_REDIRECT_URL, $permissions);
+        $role=new Role();
+        $user = new User();
+        $msg='';
+        if ($role->isUserLoggedIn())
+        {
+            $paths = new Paths();
+            return $paths->home;                
+        }
+
+        $email='';
+        if (array_key_exists('facebook',$_GET) && $_GET['facebook'])
+        {
+            header('Location:'.$fb_login_url);
+            exit;
+        } else
+        {
+            
+            try 
+            {
+                $accessToken = $helper->getAccessToken();
+            } catch(Facebook\Exception\ResponseException $e) 
+            {
+                // When Graph returns an error
+                $msg='Graph returned an error: ' . $e->getMessage();
+            } catch(Facebook\Exception\SDKException $e) {
+              // When validation fails or other local issues
+                $msg='Facebook SDK returned an error: ' . $e->getMessage();
+            }
+
+            if (! isset($accessToken)) 
+            {
+                if ($helper->getError()) 
+                {
+                    
+                    $msg.="Error: " . $helper->getError() . "\n";
+                    $msg.="Error Code: " . $helper->getErrorCode() . "\n";
+                    $msg.="Error Reason: " . $helper->getErrorReason() . "\n";
+                    $msg.="Error Description: " . $helper->getErrorDescription() . "\n";
+                } else 
+                {
+                    $msg.='Bad request';
+                }
+                
+            }
+
+            // Logged in
+            //echo '<h3>Access Token</h3>';
+            //var_dump($accessToken->getValue());
+
+            // The OAuth 2.0 client handler helps us manage access tokens
+            $oAuth2Client = $fb->getOAuth2Client();
+
+            // Get the access token metadata from /debug_token
+            $tokenMetadata = $oAuth2Client->debugToken($accessToken);
+            //echo '<h3>Metadata</h3>';
+            //var_dump($tokenMetadata);
+
+            // Validation (these will throw FacebookSDKException's when they fail)
+            $tokenMetadata->validateAppId(FACEBOOK_CLIENT_ID);
+            // If you know the user ID this access token belongs to, you can validate it here
+            //$tokenMetadata->validateUserId('123');
+            $tokenMetadata->validateExpiration();
+
+            if (! $accessToken->isLongLived()) 
+            {
+              // Exchanges a short-lived access token for a long-lived one
+                try 
+                {
+                    $accessToken = $oAuth2Client->getLongLivedAccessToken($accessToken);
+                } catch (Facebook\Exception\SDKException $e) 
+                {
+                    $msg.="<p>Error getting long-lived access token: " . $e->getMessage() . "</p>\n\n";
+                }
+
+            }
+
+            $_SESSION['fb_access_token'] = (string) $accessToken;
+            
+            
+            try 
+            {
+                // Get the \Facebook\GraphNodes\GraphUser object for the current user.
+                // If you provided a 'default_access_token', the '{access-token}' is optional.
+                $response = $fb->get('/me?fields=email,first_name,last_name,address,gender',$accessToken);
+            } catch(\Facebook\Exceptions\FacebookResponseException $e) 
+            {
+                // When Graph returns an error
+                $msg.='Graph returned an error: ' . $e->getMessage();
+            } catch(\Facebook\Exceptions\FacebookSDKException $e) 
+            {
+                // When validation fails or other local issues
+                $msg.='Facebook SDK returned an error: ' . $e->getMessage();
+            }
+
+            if (!$msg)
+            {
+                $me = $response->getGraphUser();
+                $email=$me->getProperty('email');
+                $user->find(array('email'=>$email));
+                if ($user->getId()==0)
+                {
+                    $user->setEmail($me->getProperty('email'));
+                    $user->setFirstname($me->getProperty('first_name'));
+                    $user->setLastname($me->getProperty('last_name'));
+                }                
+            }
+            $secure = new Secure_config();
+            if ($user->getId())
+            {
+                $[TABLE_ELEMENT]=$this->login($[TABLE_ELEMENT],$secure);
+                $paths = new Paths();
+                header("Location: ".$paths->base_url);
+                exit(); 
+            } else
+            {
+                if (($email) && (defined('FACEBOOK_REGISTRATION_ROLE')))
+                {
+                    $[TABLE_ELEMENT]->setRole($role->getValueFromName(FACEBOOK_REGISTRATION_ROLE));
+                    $[TABLE_ELEMENT]=$this->login($[TABLE_ELEMENT],$secure);
+                    $_SESSION['tamsi_notice']='Your email '.$email.' does not exist in our system. So we are registering you as '.FACEBOOK_REGISTRATION_ROLE.'. Pls fill your profile and password.';
+
+                    $paths = new Paths();
+                    $_GET['id']=$user->getId();
+                    return $paths->admin.'/Users.dir/Edit_User.hid.rest.php';
+                }
+                else
+                {
+                    $_SESSION['tamsi_notice']='Invalid Credentials! :'.$msg;
+                    $_SESSION['user_id']=0;
+                    $_SESSION['user_name']='';
+                    $_SESSION['user_email']='';
+                    $_SESSION['user_role']='';
+                    $_SESSION['user_domain']='';
+                    $_SESSION['site_map']='';
+                }
+            }        
+        }
+    }

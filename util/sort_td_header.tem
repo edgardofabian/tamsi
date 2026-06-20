@@ -1,0 +1,1 @@
+            <input id="[TABLE_NAME]_sort_[SORT_FIELD]" type="hidden" field="[SORT_FIELD]" class="sort" name="[TABLE_NAME]_sort_filters[[SORT_FIELD]]" value='<?php echo strtoupper($[VIEW_OBJECT]->sort_filters['[SORT_FIELD]']);?>' style="display:none;">

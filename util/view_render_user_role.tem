@@ -1,0 +1,57 @@
+    public function render_[DATA]()
+    {
+        $class='';
+        $attrs='';
+        $[TABLE_ELEMENT]_field='[DATA]';
+        foreach($this->columns[$[TABLE_ELEMENT]_field]['attributes'] as $name=>$value)
+        {
+            if ($name=='class')
+            {
+               $class=$value;
+            }
+            else
+            {
+               $attrs.=$name.'="'.$value.'" ';
+            }
+            
+        }
+
+        $role = new Role();
+        $options=$role->getRoleNames();
+        $role_names = array();
+        $value=$this->user->getRole();
+        if ($this->columns[$[TABLE_ELEMENT]_field]['type']=='boolean')
+        {
+            $this->render_boolean($[TABLE_ELEMENT]_field,$value);
+        }
+        else if (($this->columns[$[TABLE_ELEMENT]_field]['type']=='hidden') || ($this->columns[$[TABLE_ELEMENT]_field]['type']=='readonly'))
+        {
+            echo "<input $attrs type='hidden' name='role[]'  value='$value' />";
+            if ($this->$this->columns[$[TABLE_ELEMENT]_field]['type']=='readonly')
+            {
+                echo "<span>".$role->getRoleName($value)."</span>";
+            }
+        } else
+        {
+            if ($this->columns[$[TABLE_ELEMENT]_field]['mode']=='edit')
+            {
+                echo "<span class='edit_input'>";
+            } else
+            {
+               echo "<span>";
+            }
+            foreach ($options as $key=>$option)
+            {
+                if ($value & $key)
+                {
+                    echo "<label><input $attrs type='checkbox' class='$class' checked='checked' value='$key' name=role[]> $option</label>";
+                    $role_names[] = $option;
+                } else
+                {
+                    echo "<label><input $attrs type='checkbox' class='$class' value='$key' name=role[]> $option</label>";
+                }
+             }
+             echo "</span>";
+             echo '<span class="view_input">'.implode(", ",$role_names).'</span>';
+        }
+    }

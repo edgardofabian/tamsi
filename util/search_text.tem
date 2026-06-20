@@ -1,0 +1,31 @@
+        $search='';
+        if (isset($_REQUEST['[TABLE_NAME]_search_texts']))
+        {
+            $this->search_texts = $_REQUEST['[TABLE_NAME]_search_texts'];
+            $_SESSION['list_[TABLE_NAME]']['search_texts']=$this->search_texts;
+        }
+        else
+        {
+            $this->search_texts = $_SESSION['list_[TABLE_NAME]']['search_texts'];
+        }
+        if (is_array($this->search_texts))
+        {
+            foreach($this->search_texts as $fld=>$val)
+            {
+                if ((trim($val)) && in_array($fld,$valid_filters))
+                {
+                    if ($search)
+                    {
+                        $search.=" AND $fld like '%$val%' ";
+                    }
+                    else
+                    {
+                        $search=" $fld like '%$val%' ";
+                    }
+                }
+            }
+        }
+        if ($search)
+        {
+            $this->select_filters[] = $search;
+        }

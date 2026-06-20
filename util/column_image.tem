@@ -1,0 +1,19 @@
+    public function upload[IMAGE_NAME]Action()
+    {
+		$[TABLE_ELEMENT] = $this->get[CLASS_NAME]();;
+        $name = $this->generateImageName($[TABLE_ELEMENT],'[IMAGE_FOLDER]');
+        $filename=$this->uploadImage($[TABLE_ELEMENT],'[IMAGE_FOLDER]',TRUE);
+        if ($filename)
+        {
+            $[TABLE_ELEMENT]->set[IMAGE_NAME]($filename);
+            $[TABLE_ELEMENT]->save();
+            if (isset($_POST['redirect']) && $_POST['redirect'])
+            {
+                $url = $_POST['redirect'];
+                header('Location: '.$url);
+                exit();
+            }               
+            return TRUE;
+        }
+        return FALSE;
+    }

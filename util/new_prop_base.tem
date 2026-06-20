@@ -1,0 +1,4 @@
+        $this->form_attributes=''; //attributes added to the new form
+        $this->button_name='Create'; //Label of the new submit button
+        $this->button_url='?command=newRest&object=[CLASS_NAME]'; //url of the controller where the new form will be submitted through ajax
+        $this->button_next_url='?command=display_rest&path=[ADMIN_DIR]/[CONTROLLER_NAME].dir/List_[CONTROLLER_NAME].rest.php'; //url of the controller that will be visited after completing the new submission

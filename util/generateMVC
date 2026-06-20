@@ -1,0 +1,6 @@
+#!/bin/bash
+# echo $1 $2 $3 $4
+php generateModel.php $1 $2 $3 $4
+php generateController.php $1 $2 $3 $4
+php generateView.php $1 $2 $3 $4
+

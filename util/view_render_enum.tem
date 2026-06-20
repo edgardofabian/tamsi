@@ -1,0 +1,58 @@
+    public function render_[DATA]()
+    {
+		$class='';
+        $attrs='';
+        $[TABLE_ELEMENT]_field='[DATA]';
+        foreach($this->columns[$[TABLE_ELEMENT]_field]['attributes'] as $name=>$value)
+        {
+            if ($name=='class')
+            {
+               $class.=' '.$value;
+            }
+            else
+            {
+               $attrs.=$name.'="'.$value.'" ';
+            }
+        }
+    
+        $val=$this->[TABLE_ELEMENT]->get[DATA_FUNCTION_NAME]();
+		if ($this->columns[$[TABLE_ELEMENT]_field]['type']=='boolean')
+        {
+            $this->render_boolean($[TABLE_ELEMENT]_field,$value);
+        }
+        else if (($this->columns[$[TABLE_ELEMENT]_field]['type']=='hidden') || ($this->columns[$[TABLE_ELEMENT]_field]['type']=='readonly'))
+        {
+            echo "<input $attrs type='hidden' name='[DATA]'  value='$val' />";
+            if ($this->columns[$[TABLE_ELEMENT]_field]['type']=='readonly')
+            {
+                echo "<span >$val</span>";
+            }
+        } else
+        {
+            if ($this->columns[$[TABLE_ELEMENT]_field]['mode']=='edit')
+            {
+                echo "<select $attrs class='$class edit_input' [CUSTOM] name='[DATA]' >\n";
+            } else
+            {
+                echo "<select $attrs class='$class' [CUSTOM] name='[DATA]' >\n";
+            } 
+			$options=[ENUM_CHOICES];
+            if (array_key_exists('[FILTER_FIELD]',$this->columns) && array_key_exists('options',$this->columns['[FILTER_FIELD]']) && ($this->columns['[FILTER_FIELD]']['options']))
+            {
+                $options = $this->columns['[FILTER_FIELD]']['options'];
+            }            
+			foreach($options as $option=>$label)
+			{
+				if ($val==$option)
+				{
+					echo "<option selected='selected' value='$option' >$label</option>\n";
+				} else
+				{
+					echo "<option value='$option' >$label</option>\n";
+				}
+			}
+			echo "</select>\n";
+            if ($this->columns[$[TABLE_ELEMENT]_field]['mode']=='edit') echo "<span class='view_input'>$val</span>";
+            
+        }
+    }

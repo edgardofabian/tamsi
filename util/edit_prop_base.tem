@@ -1,0 +1,6 @@
+        $this->form_attributes=''; //attributes added to the form
+        $this->button_name='Update'; //Visible name of the Edit submit button
+        $this->button_url='?command=editRest&object=[CLASS_NAME]'; //url of the controller where edit form will be posted by ajax
+        $this->button_next_url='?command=display_rest&path=[ADMIN_DIR]/[CONTROLLER_NAME].dir/Edit_[CLASS_NAME].hid.rest.php&id='.$this->[TABLE_ELEMENT]->getId(); //url that will be visited after completing the edit submission
+        $this->delete_button_url='?command=deleteRest&object=[CLASS_NAME]'; //url of the controller where delete form will be submitted
+        $this->delete_button_next_url='?command=display_rest&path=[ADMIN_DIR]/[CONTROLLER_NAME].dir/List_[CONTROLLER_NAME].rest.php'; //url that will be visited after completing the delete submission

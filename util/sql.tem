@@ -1,0 +1,15 @@
+        $db = new db();
+        $mysqli = new mysqli($db->host,$db->user, $db->password, $db->name);
+        if ($mysqli->connect_errno) 
+        {
+            $_SESSION['tamsi_notice'].="Connect failed: ".$mysqli->connect_error." \r\n";
+            return false;
+        } 
+        $mysqli->query($sql);
+        if ($mysqli->error)
+        {
+            $_SESSION['tamsi_notice'].="Errormessage: ".$mysqli->error."  \r\n";
+            return false;
+        }
+        $mysqli->close();
+        return true;

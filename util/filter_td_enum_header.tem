@@ -1,0 +1,26 @@
+    public function render_[FILTER_FIELD]_filter()
+    {
+		echo "<select  class='filter' name='[TABLE_NAME]_select_filters[[FILTER_FIELD]]' value='' > \r\n";
+        echo "<option value=''>All</option> \r\n";
+		$options=[ENUM_CHOICES];
+        if (array_key_exists('[FILTER_FIELD]',$this->columns) && array_key_exists('options',$this->columns['[FILTER_FIELD]']) && ($this->columns['[FILTER_FIELD]']['options']))
+        {
+            $options = $this->columns['[FILTER_FIELD]']['options'];
+        } 
+        foreach($options as $option=>$label)
+		{
+			if ($option)
+            {
+                if ((array_key_exists('[FILTER_FIELD]',$this->select_filters)) && ($this->select_filters['[FILTER_FIELD]']==$option))
+                {
+                    echo "<option selected='selected' value='".$option."' >".$label."</option>";
+                } 
+                else
+                {
+                    echo "<option value='".$option."' >".$label."</option>";
+                }
+            }
+		}
+		echo "</select> \r\n";		
+	}
+	

@@ -1,0 +1,7 @@
+        $mysqli = new mysqli($this->db->host,$this->db->user, $this->db->password, $this->db->name);
+        if ($mysqli->connect_errno) 
+        {
+            $_SESSION['tamsi_notice'].="Connect failed: ".$mysqli->connect_error." \r\n";
+            return false;
+        } 
+        

@@ -1,0 +1,186 @@
+<script>
+$(document).ready(function() 
+{
+	var container = '<?php echo $[VIEW_OBJECT]->container;?>';
+	var form_list = '<?php echo $[VIEW_OBJECT]->form_list;?>';
+    
+    var sort_filters = [<?PHP 
+                        $i=0;
+                        foreach ($[VIEW_OBJECT]->sort_orders as $order) 
+                        {
+                            if ($i==0)
+                            {
+                                echo "'$order'";
+                            } else echo ",'$order'";
+                            $i=$i+1;
+                        }?>];
+    $('input.sort_order').val(sort_filters.toString());
+    $('form').find('.toggle_sort').each( function()
+    {
+        var sort_handle = $(this).closest('th').find('input.sort');
+        if (sort_handle.val()=='ASC')
+        {
+            $(this).removeClass('fa-sort-desc');
+            $(this).removeClass('fa-sort');
+            $(this).addClass('fa-sort-asc');
+        } else if (sort_handle.val()=='DESC')
+        {
+            $(this).removeClass('fa-sort-asc');
+            $(this).removeClass('fa-sort');
+            $(this).addClass('fa-sort-desc');
+        } else
+        {
+            $(this).removeClass('fa-sort-desc');
+            $(this).removeClass('fa-sort-asc');
+            $(this).addClass('fa-sort');                
+        }        
+        $(this).click( function()
+        {
+            var sort_handle = $(this).closest('th').find('input.sort');
+            if ($(this).hasClass('fa-sort-asc'))
+            {
+                sort_handle.val('DESC');
+            } else
+            if ($(this).hasClass('fa-sort-desc'))
+            {
+                sort_handle.val('');
+            } else
+            if ($(this).hasClass('fa-sort'))
+            {
+                sort_handle.val('ASC');             
+            }
+
+
+            if (sort_handle.hasClass('sort'))
+            {
+                var index = sort_filters.indexOf(sort_handle.attr('field'));
+                if (index>=0)
+                {
+                    sort_filters.splice(index, 1);
+                } 
+                if ((sort_handle.val()=='ASC')||(sort_handle.val()=='DESC'))
+                {
+                    sort_filters.unshift(sort_handle.attr('field'));
+                }
+            }
+            if (sort_filters.length>0)
+            {
+                $('input.sort_order').val(sort_filters.toString());
+            }
+            
+            var page=parseInt($('input.field_page').val());
+            var url=$('#'+form_list).attr('action')+'&page='+page+'&sort_order='+$('input.sort_order').val();
+            var url_rest = url.replace('display_php','display_rest');
+            loadToSelector(url_rest,container,'#'+form_list,'',loader_img);
+            
+        });
+    });
+    $('form').find('select.filter').each( function()
+    {
+        $(this).change( function()
+        {
+            if (sort_filters.length>0)
+            {
+                $('input.sort_order').val(sort_filters.toString());
+            }
+
+            var page=parseInt($('input.field_page').val());
+            var url=$('#'+form_list).attr('action')+'&page='+page+'&sort_order='+$('input.sort_order').val();
+            var url_rest = url.replace('display_php','display_rest');
+            loadToSelector(url_rest,container,'#'+form_list,'',loader_img);
+            
+        });
+    });    
+    var list_search_timer = 0;
+    
+	$('#'+form_list).find('.search_text').each( function()
+    {
+        $(this).keyup( function()
+        {
+            if (sort_filters.length>0)
+            {
+                $('#'+form_list+' input.sort_order').val(sort_filters.toString());
+            }
+
+            var page=parseInt($('#'+form_list+' input.field_page').val());
+            var url=$('#'+form_list).attr('action')+'&page='+page+'&sort_order='+$('#'+form_list+' input.sort_order').val();
+            var url_rest = url.replace('display_php','display_rest');
+            
+            clearTimeout(list_search_timer);
+            
+            list_search_timer = setTimeout( function () { loadToSelector(url_rest,container,'#'+form_list,'',loader_img) },500);
+            
+        });
+        $(this).change( function()
+        {
+            if (sort_filters.length>0)
+            {
+                $('#'+form_list+' input.sort_order').val(sort_filters.toString());
+            }
+
+            var page=parseInt($('#'+form_list+' input.field_page').val());
+            var url=$('#'+form_list).attr('action')+'&page='+page+'&sort_order='+$('#'+form_list+' input.sort_order').val();
+            var url_rest = url.replace('display_php','display_rest');
+            
+            clearTimeout(list_search_timer);
+            
+            list_search_timer = setTimeout( function () { loadToSelector(url_rest,container,'#'+form_list,'',loader_img) },500);
+            
+        });
+    });   
+    $('#'+form_list).find('.search_text_button.clear').each( function()
+    {
+        $(this).click( function()
+        {
+            $(this).parent('.search_filter_header').find('.search_text').val("");
+            $(this).parent('.search_filter_header').find('.search_text').trigger('change');
+        });
+    });   
+    $("#clear_search_and_sort").click( function()
+    {
+        $("table.data").find("input.search_text").each( function()
+        {
+            $(this).val("");
+        });
+        $("table.data").find("select.filter").each( function()
+        {
+            $(this).val("");
+        });			
+        $("table.data").find("input.sort").each( function()
+        {
+            $(this).val("");
+        });
+        $("table.data").find("a.toglle_sort").each( function()
+        {
+            if ($(this).hasClass("fa-sort-asc"))
+            {
+                $(this).removeClass("fa-sort-asc");
+            }
+            if ($(this).hasClass("fa-sort-desc"))
+            {
+                $(this).removeClass("fa-sort-desc");
+            }
+            if ($(this).hasClass("fa-sort"))
+            {
+            
+            }
+            else
+            {
+                $(this).addClass("fa-sort-asc");
+            }
+            
+            $(this).removeClass("fa-sort-asc");
+        });
+        
+        if (sort_filters.length>0)
+        {
+            $('input.sort_order').val(sort_filters.toString());
+        }
+
+        var page=parseInt($('input.field_page').val());
+        var url=$('#'+form_list).attr('action')+'&page='+page+'&sort_order='+$('input.sort_order').val();
+        var url_rest = url.replace('display_php','display_rest');
+        loadToSelector(url_rest,container,'#'+form_list,'',loader_img);        
+    });         
+});
+</script>

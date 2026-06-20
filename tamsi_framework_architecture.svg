@@ -1,0 +1,254 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#16a34a"/>
+    </marker>
+    <marker id="arrow-orange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ea580c"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7c3aed"/>
+    </marker>
+    <linearGradient id="header-grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1e3a5f"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="config-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fde68a"/>
+    </linearGradient>
+    <linearGradient id="tamsi-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#dbeafe"/>
+      <stop offset="100%" stop-color="#bfdbfe"/>
+    </linearGradient>
+    <linearGradient id="app-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#dcfce7"/>
+      <stop offset="100%" stop-color="#bbf7d0"/>
+    </linearGradient>
+    <linearGradient id="usr-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f3e8ff"/>
+      <stop offset="100%" stop-color="#e9d5ff"/>
+    </linearGradient>
+    <linearGradient id="usrgen-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fce7f3"/>
+      <stop offset="100%" stop-color="#fbcfe8"/>
+    </linearGradient>
+    <linearGradient id="util-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff7ed"/>
+      <stop offset="100%" stop-color="#ffedd5"/>
+    </linearGradient>
+    <linearGradient id="pub-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0f9ff"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.15"/>
+    </filter>
+    <filter id="shadow-light" x="-3%" y="-3%" width="106%" height="106%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- Title bar -->
+  <rect x="0" y="0" width="1200" height="60" rx="0" fill="url(#header-grad)" filter="url(#shadow)"/>
+  <text x="600" y="38" text-anchor="middle" fill="#fff" font-size="24" font-weight="bold">Tamsi Framework Architecture</text>
+
+  <!-- Legend -->
+  <rect x="800" y="10" width="390" height="45" rx="6" fill="#fff" opacity="0.9" filter="url(#shadow-light)"/>
+  <text x="815" y="29" fill="#333" font-size="10" font-weight="bold">LEGEND</text>
+  <line x1="815" y1="36" x2="840" y2="36" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <text x="843" y="39" fill="#333" font-size="9">extends / inherits</text>
+  <line x1="940" y1="36" x2="965" y2="36" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)"/>
+  <text x="968" y="39" fill="#333" font-size="9">generates</text>
+  <line x1="1045" y1="36" x2="1070" y2="36" stroke="#7c3aed" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrow-purple)"/>
+  <text x="1073" y="39" fill="#333" font-size="9">no direct changes</text>
+
+  <!-- ============ CONFIG ============ -->
+  <rect x="30" y="75" width="230" height="115" rx="8" fill="url(#config-grad)" stroke="#d97706" stroke-width="2" filter="url(#shadow)"/>
+  <text x="145" y="98" text-anchor="middle" fill="#92400e" font-size="14" font-weight="bold">Config</text>
+  <line x1="45" y1="106" x2="245" y2="106" stroke="#d97706" stroke-width="1"/>
+  <text x="50" y="122" fill="#92400e" font-size="10">• Paths configuration</text>
+  <text x="50" y="137" fill="#92400e" font-size="10">• Database connections</text>
+  <text x="50" y="152" fill="#92400e" font-size="10">• Routing rules</text>
+  <text x="50" y="167" fill="#92400e" font-size="10">• Security settings</text>
+  <text x="50" y="182" fill="#92400e" font-size="10">• Constant definitions</text>
+
+  <!-- ============ MVC Blocks Container ============ -->
+  <rect x="280" y="75" width="620" height="730" rx="10" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="6,3"/>
+  <text x="590" y="93" text-anchor="middle" fill="#64748b" font-size="11" font-style="italic">Model-View-Controller (MVC) Architecture Layers</text>
+
+  <!-- ============ TAMSI (Core Framework) ============ -->
+  <rect x="300" y="105" width="580" height="180" rx="8" fill="url(#tamsi-grad)" stroke="#2563eb" stroke-width="2.5" filter="url(#shadow)"/>
+  <rect x="300" y="105" width="580" height="28" rx="8" fill="#2563eb"/>
+  <rect x="300" y="121" width="580" height="12" fill="#2563eb"/>
+  <text x="590" y="123" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">tamsi / (Core Framework — NO modifications allowed)</text>
+  <text x="310" y="152" fill="#1e40af" font-size="11" font-style="italic">Foundation MVC classes that define the framework contract</text>
+
+  <!-- tamsi sub-blocks -->
+  <rect x="315" y="162" width="175" height="110" rx="5" fill="#eff6ff" stroke="#93c5fd" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="402" y="180" text-anchor="middle" fill="#1e40af" font-size="12" font-weight="bold">models/</text>
+  <text x="325" y="196" fill="#1e40af" font-size="9">ModelBase.php</text>
+  <text x="325" y="210" fill="#1e40af" font-size="9">TamsiModel.php</text>
+  <text x="325" y="224" fill="#1e40af" font-size="9">TamsiPage.php</text>
+  <text x="325" y="238" fill="#1e40af" font-size="9">TamsiUser.php</text>
+  <text x="325" y="252" fill="#1e40af" font-size="9">+ more base models</text>
+
+  <rect x="502" y="162" width="175" height="110" rx="5" fill="#eff6ff" stroke="#93c5fd" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="589" y="180" text-anchor="middle" fill="#1e40af" font-size="12" font-weight="bold">views/</text>
+  <text x="512" y="196" fill="#1e40af" font-size="9">ViewBase.php</text>
+  <text x="512" y="210" fill="#1e40af" font-size="9">CoreView.php</text>
+  <text x="512" y="224" fill="#1e40af" font-size="9">TamsiView.php</text>
+  <text x="512" y="238" fill="#1e40af" font-size="9">PaginatorView.php</text>
+  <text x="512" y="252" fill="#1e40af" font-size="9">+ more base views</text>
+
+  <rect x="690" y="162" width="175" height="110" rx="5" fill="#eff6ff" stroke="#93c5fd" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="777" y="180" text-anchor="middle" fill="#1e40af" font-size="12" font-weight="bold">controllers/</text>
+  <text x="700" y="196" fill="#1e40af" font-size="9">CoreController.php</text>
+  <text x="700" y="210" fill="#1e40af" font-size="9">TamsiController.php</text>
+  <text x="700" y="224" fill="#1e40af" font-size="9">TamsiEmailsController.php</text>
+  <text x="700" y="238" fill="#1e40af" font-size="9">TamsiFilesController.php</text>
+  <text x="700" y="252" fill="#1e40af" font-size="9">+ more base controllers</text>
+
+  <!-- tamsi no-edit lock indicator -->
+  <rect x="840" y="108" width="30" height="24" rx="4" fill="#dc2626" opacity="0.85"/>
+  <text x="855" y="124" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">🔒</text>
+
+  <!-- ============ APP (Extends tamsi) ============ -->
+  <rect x="300" y="300" width="580" height="180" rx="8" fill="url(#app-grad)" stroke="#16a34a" stroke-width="2.5" filter="url(#shadow)"/>
+  <rect x="300" y="300" width="580" height="28" rx="8" fill="#16a34a"/>
+  <rect x="300" y="316" width="580" height="12" fill="#16a34a"/>
+  <text x="590" y="318" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">app / (Extends or overrides tamsi — user-customizable)</text>
+  <text x="310" y="347" fill="#166534" font-size="11" font-style="italic">Extends core framework; allows override without touching tamsi/</text>
+
+  <!-- app sub-blocks -->
+  <rect x="315" y="357" width="175" height="110" rx="5" fill="#f0fdf4" stroke="#86efac" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="402" y="375" text-anchor="middle" fill="#166534" font-size="12" font-weight="bold">models/</text>
+  <text x="325" y="391" fill="#166534" font-size="9">Model.php</text>
+  <text x="325" y="405" fill="#166534" font-size="9">Page.php</text>
+  <text x="325" y="419" fill="#166534" font-size="9">Role.php</text>
+  <text x="325" y="433" fill="#166534" font-size="9">Email.php</text>
+  <text x="325" y="447" fill="#166534" font-size="9">+ custom models</text>
+
+  <rect x="502" y="357" width="175" height="110" rx="5" fill="#f0fdf4" stroke="#86efac" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="589" y="375" text-anchor="middle" fill="#166534" font-size="12" font-weight="bold">views/</text>
+  <text x="512" y="391" fill="#166534" font-size="9">View.php</text>
+  <text x="512" y="405" fill="#166534" font-size="9">page.php</text>
+  <text x="512" y="419" fill="#166534" font-size="9">Javascript.php</text>
+  <text x="512" y="433" fill="#166534" font-size="9">error_missing.php</text>
+  <text x="512" y="447" fill="#166534" font-size="9">+ custom views</text>
+
+  <rect x="690" y="357" width="175" height="110" rx="5" fill="#f0fdf4" stroke="#86efac" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="777" y="375" text-anchor="middle" fill="#166534" font-size="12" font-weight="bold">controllers/</text>
+  <text x="700" y="391" fill="#166534" font-size="9">Controller.php</text>
+  <text x="700" y="405" fill="#166534" font-size="9">Security.php</text>
+  <text x="700" y="419" fill="#166534" font-size="9">EmailsController.php</text>
+  <text x="700" y="433" fill="#166534" font-size="9">FilesController.php</text>
+  <text x="700" y="447" fill="#166534" font-size="9">+ custom controllers</text>
+
+  <!-- Arrow: app extends tamsi -->
+  <line x1="590" y1="285" x2="590" y2="298" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+  <text x="595" y="294" fill="#2563eb" font-size="9" font-weight="bold">extends</text>
+
+  <!-- ============ USR_GENERATED ============ -->
+  <rect x="300" y="495" width="580" height="180" rx="8" fill="url(#usrgen-grad)" stroke="#db2777" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="300" y="495" width="580" height="28" rx="8" fill="#db2777"/>
+  <rect x="300" y="511" width="580" height="12" fill="#db2777"/>
+  <text x="590" y="513" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">usr_generated / (Auto-generated base MVC — DO NOT EDIT)</text>
+  <text x="310" y="542" fill="#9d174d" font-size="11" font-style="italic">Auto-generated base classes for each database table</text>
+
+  <!-- usr_generated sub-blocks -->
+  <rect x="315" y="552" width="175" height="110" rx="5" fill="#fff1f2" stroke="#fda4af" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="402" y="570" text-anchor="middle" fill="#9d174d" font-size="12" font-weight="bold">models/</text>
+  <text x="325" y="586" fill="#9d174d" font-size="9">*Protected.php</text>
+  <text x="325" y="600" fill="#9d174d" font-size="9">*Public.php</text>
+  <text x="325" y="614" fill="#9d174d" font-size="9">(Field access layers)</text>
+  <text x="325" y="628" fill="#9d174d" font-size="9">per database table</text>
+  <text x="325" y="642" fill="#9d174d" font-size="9">generated from DB schema</text>
+
+  <rect x="502" y="552" width="175" height="110" rx="5" fill="#fff1f2" stroke="#fda4af" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="589" y="570" text-anchor="middle" fill="#9d174d" font-size="12" font-weight="bold">views/</text>
+  <text x="512" y="586" fill="#9d174d" font-size="9">*ViewBase.php</text>
+  <text x="512" y="600" fill="#9d174d" font-size="9">*.tamsi.php templates</text>
+  <text x="512" y="614" fill="#9d174d" font-size="9">(CRUD view templates)</text>
+  <text x="512" y="628" fill="#9d174d" font-size="9">edit / list / new</text>
+  <text x="512" y="642" fill="#9d174d" font-size="9">per database table</text>
+
+  <rect x="690" y="552" width="175" height="110" rx="5" fill="#fff1f2" stroke="#fda4af" stroke-width="1" filter="url(#shadow-light)"/>
+  <text x="777" y="570" text-anchor="middle" fill="#9d174d" font-size="12" font-weight="bold">controllers/</text>
+  <text x="700" y="586" fill="#9d174d" font-size="9">*Controller.php</text>
+  <text x="700" y="600" fill="#9d174d" font-size="9">(Admin CRUD controllers)</text>
+  <text x="700" y="614" fill="#9d174d" font-size="9">per database table</text>
+  <text x="700" y="628" fill="#9d174d" font-size="9">generated by</text>
+  <text x="700" y="642" fill="#9d174d" font-size="9">generateMVC</text>
+
+  <!-- ============ USR ============ -->
+  <rect x="300" y="690" width="580" height="100" rx="8" fill="url(#usr-grad)" stroke="#7c3aed" stroke-width="2.5" filter="url(#shadow)"/>
+  <rect x="300" y="690" width="580" height="28" rx="8" fill="#7c3aed"/>
+  <rect x="300" y="706" width="580" height="12" fill="#7c3aed"/>
+  <text x="590" y="708" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">usr / (Extends usr_generated — user-customizable logic)</text>
+  <text x="310" y="737" fill="#5b21b6" font-size="11" font-style="italic">Extends generated base classes; user edits here to customize behavior</text>
+
+  <!-- usr sub-blocks -->
+  <rect x="315" y="747" width="175" height="35" rx="4" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1"/>
+  <text x="402" y="769" text-anchor="middle" fill="#5b21b6" font-size="11" font-weight="bold">models/</text>
+  <rect x="502" y="747" width="175" height="35" rx="4" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1"/>
+  <text x="589" y="769" text-anchor="middle" fill="#5b21b6" font-size="11" font-weight="bold">views/</text>
+  <rect x="690" y="747" width="175" height="35" rx="4" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1"/>
+  <text x="777" y="769" text-anchor="middle" fill="#5b21b6" font-size="11" font-weight="bold">controllers/</text>
+
+  <!-- Arrow: usr extends usr_generated -->
+  <line x1="590" y1="675" x2="590" y2="688" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+  <text x="595" y="684" fill="#2563eb" font-size="9" font-weight="bold">extends</text>
+
+  <!-- ============ UTIL (Generate MVC) ============ -->
+  <rect x="30" y="210" width="230" height="220" rx="8" fill="url(#util-grad)" stroke="#ea580c" stroke-width="2" filter="url(#shadow)"/>
+  <text x="145" y="233" text-anchor="middle" fill="#9a3412" font-size="14" font-weight="bold">Util</text>
+  <line x1="45" y1="241" x2="245" y2="241" stroke="#ea580c" stroke-width="1"/>
+  <text x="50" y="258" fill="#9a3412" font-size="11" font-weight="bold">generateMVC script</text>
+  <text x="50" y="275" fill="#9a3412" font-size="10">Shell wrapper that calls:</text>
+  <text x="60" y="293" fill="#9a3412" font-size="10">• generateModel.php</text>
+  <text x="60" y="308" fill="#9a3412" font-size="10">• generateView.php</text>
+  <text x="60" y="323" fill="#9a3412" font-size="10">• generateController.php</text>
+  <text x="50" y="345" fill="#9a3412" font-size="11" font-weight="bold">Usage:</text>
+  <text x="60" y="362" fill="#9a3412" font-size="10">./generateMVC &lt;table&gt;</text>
+  <text x="50" y="382" fill="#9a3412" font-size="11" font-weight="bold">Generates:</text>
+  <text x="60" y="399" fill="#9a3412" font-size="10">• Models (Protected + Public)</text>
+  <text x="60" y="414" fill="#9a3412" font-size="10">• CRUD Views + Templates</text>
+  <text x="60" y="429" fill="#9a3412" font-size="10">• Admin CRUD Controllers</text>
+
+  <!-- Arrow: util generates usr_generated -->
+  <line x1="260" y1="350" x2="298" y2="540" stroke="#ea580c" stroke-width="2.5" marker-end="url(#arrow-orange)"/>
+  <text x="265" y="445" fill="#ea580c" font-size="10" font-weight="bold" transform="rotate(-65, 265, 445)">auto-generates</text>
+
+  <!-- ============ PUBLIC_HTML ============ -->
+  <rect x="30" y="450" width="230" height="100" rx="8" fill="url(#pub-grad)" stroke="#0284c7" stroke-width="2" filter="url(#shadow)"/>
+  <text x="145" y="473" text-anchor="middle" fill="#0369a1" font-size="14" font-weight="bold">public_html /</text>
+  <line x1="45" y1="481" x2="245" y2="481" stroke="#0284c7" stroke-width="1"/>
+  <text x="50" y="498" fill="#0369a1" font-size="10">• Web root / entry point</text>
+  <text x="50" y="513" fill="#0369a1" font-size="10">• index.php</text>
+  <text x="50" y="528" fill="#0369a1" font-size="10">• CSS, JS, images</text>
+  <text x="50" y="543" fill="#0369a1" font-size="10">• Frontend libraries</text>
+
+  <!-- Arrow from public_html to tamsi (loads framework) -->
+  <path d="M 260 500 Q 270 500 275 240 Q 278 180 298 195" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,3" fill="none" marker-end="url(#arrow-purple)"/>
+  <text x="280" y="360" fill="#7c3aed" font-size="9" font-style="italic" transform="rotate(-80, 280, 360)">bootstraps framework</text>
+
+  <!-- Flow arrows from MVC blocks to public_html -->
+  <path d="M 300 800 Q 200 810 160 550" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arrow-purple)"/>
+  <text x="175" y="730" fill="#7c3aed" font-size="9" font-style="italic" transform="rotate(-65, 175, 730)">serves HTTP</text>
+
+  <!-- Bottom note -->
+  <rect x="30" y="570" width="230" height="50" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="145" y="590" text-anchor="middle" fill="#475569" font-size="10" font-weight="bold">Extension Rule</text>
+  <text x="145" y="606" text-anchor="middle" fill="#64748b" font-size="9">app &amp; usr extend, never modify</text>
+  <text x="145" y="618" text-anchor="middle" fill="#64748b" font-size="9">tamsi / usr_generated directly</text>
+
+  <!-- No-direct-changes indicators -->
+  <line x1="520" y1="130" x2="560" y2="130" stroke="#dc2626" stroke-width="2"/>
+  <text x="545" y="128" text-anchor="middle" fill="#dc2626" font-size="8">✗</text>
+  <line x1="520" y1="520" x2="560" y2="520" stroke="#dc2626" stroke-width="2"/>
+  <text x="545" y="518" text-anchor="middle" fill="#dc2626" font-size="8">✗</text>
+</svg>

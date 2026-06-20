@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tamsi Framework Architecture</title>
+<style>
+div.tamsi_architecture {
+  font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+  color: #1e293b;
+  line-height: 1.6;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+div.tamsi_architecture * {
+  box-sizing: border-box;
+}
+div.tamsi_architecture h1 {
+  background: linear-gradient(90deg, #1e3a5f, #2563eb);
+  color: #fff;
+  padding: 18px 28px;
+  border-radius: 10px;
+  font-size: 26px;
+  margin: 0 0 24px 0;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+div.tamsi_architecture h2 {
+  border-left: 5px solid #2563eb;
+  padding: 8px 16px;
+  margin: 32px 0 16px 0;
+  font-size: 20px;
+  background: #f8fafc;
+  border-radius: 0 8px 8px 0;
+}
+div.tamsi_architecture h3 {
+  font-size: 16px;
+  margin: 20px 0 10px 0;
+  color: #334155;
+}
+div.tamsi_architecture p {
+  margin: 8px 0;
+}
+div.tamsi_architecture .diagram-container {
+  text-align: center;
+  margin: 20px 0;
+  padding: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+div.tamsi_architecture .diagram-container svg {
+  max-width: 100%;
+  height: auto;
+}
+div.tamsi_architecture .dir-tree {
+  background: #1e293b;
+  color: #e2e8f0;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  line-height: 1.7;
+  margin: 10px 0;
+  white-space: pre-wrap;     /* Preserves spaces + wraps long lines safely */
+}
+div.tamsi_architecture .dir-tree .comment {
+  color: #94a3b8;
+  font-style: italic;
+}
+div.tamsi_architecture .dir-tree .highlight {
+  color: #fbbf24;
+}
+div.tamsi_architecture .dir-tree .highlight2 {
+  color: #6ee7b7;
+}
+div.tamsi_architecture .dir-tree .highlight3 {
+  color: #a5b4fc;
+}
+div.tamsi_architecture .grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 12px 0;
+}
+div.tamsi_architecture .card {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+div.tamsi_architecture .card h4 {
+  margin: 0 0 8px 0;
+  font-size: 15px;
+}
+div.tamsi_architecture .card ul {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+div.tamsi_architecture .card li {
+  font-size: 13px;
+  margin: 2px 0;
+}
+div.tamsi_architecture .card.config { border-top: 4px solid #d97706; background: #fffbeb; }
+div.tamsi_architecture .card.config h4 { color: #92400e; }
+div.tamsi_architecture .card.tamsi { border-top: 4px solid #2563eb; background: #eff6ff; }
+div.tamsi_architecture .card.tamsi h4 { color: #1e40af; }
+div.tamsi_architecture .card.app { border-top: 4px solid #16a34a; background: #f0fdf4; }
+div.tamsi_architecture .card.app h4 { color: #166534; }
+div.tamsi_architecture .card.usrgen { border-top: 4px solid #db2777; background: #fff1f2; }
+div.tamsi_architecture .card.usrgen h4 { color: #9d174d; }
+div.tamsi_architecture .card.usr { border-top: 4px solid #7c3aed; background: #f5f3ff; }
+div.tamsi_architecture .card.usr h4 { color: #5b21b6; }
+div.tamsi_architecture .card.util { border-top: 4px solid #ea580c; background: #fff7ed; }
+div.tamsi_architecture .card.util h4 { color: #9a3412; }
+div.tamsi_architecture .card.public { border-top: 4px solid #0284c7; background: #f0f9ff; }
+div.tamsi_architecture .card.public h4 { color: #0369a1; }
+div.tamsi_architecture .card.locked {
+  position: relative;
+}
+div.tamsi_architecture .card.locked::after {
+  content: "🔒 NO EDITS";
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 10px;
+  font-weight: bold;
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+div.tamsi_architecture .inheritance-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 16px 0;
+  padding: 12px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  flex-wrap: wrap;
+}
+div.tamsi_architecture .inheritance-flow .arrow {
+  color: #2563eb;
+  font-size: 20px;
+  font-weight: bold;
+}
+div.tamsi_architecture .inheritance-flow .gen-arrow {
+  color: #ea580c;
+  font-size: 20px;
+  font-weight: bold;
+}
+div.tamsi_architecture .inheritance-flow .lock {
+  color: #dc2626;
+  font-size: 14px;
+}
+div.tamsi_architecture .inheritance-flow .box {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+div.tamsi_architecture .inheritance-flow .box.tamsi-box { background: #bfdbfe; color: #1e40af; }
+div.tamsi_architecture .inheritance-flow .box.app-box { background: #bbf7d0; color: #166534; }
+div.tamsi_architecture .inheritance-flow .box.usrgen-box { background: #fbcfe8; color: #9d174d; }
+div.tamsi_architecture .inheritance-flow .box.usr-box { background: #e9d5ff; color: #5b21b6; }
+div.tamsi_architecture .inheritance-flow .box.util-box { background: #fed7aa; color: #9a3412; }
+div.tamsi_architecture .inheritance-flow .box.pub-box { background: #bae6fd; color: #0369a1; }
+div.tamsi_architecture .code-block {
+  background: #1e293b;
+  color: #e2e8f0;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  overflow-x: auto;
+  line-height: 1.6;
+  margin: 8px 0;
+  white-space: pre-wrap;     /* Preserves spaces + wraps long lines safely */
+  
+}
+div.tamsi_architecture .code-block .kw { color: #c084fc; }
+div.tamsi_architecture .code-block .str { color: #6ee7b7; }
+div.tamsi_architecture .code-block .cm { color: #94a3b8; font-style: italic; }
+div.tamsi_architecture .code-block .fn { color: #fbbf24; }
+div.tamsi_architecture .code-block .num { color: #f472b6; }
+div.tamsi_architecture .badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+div.tamsi_architecture .badge.blue { background: #dbeafe; color: #1e40af; }
+div.tamsi_architecture .badge.green { background: #dcfce7; color: #166534; }
+div.tamsi_architecture .badge.pink { background: #fce7f3; color: #9d174d; }
+div.tamsi_architecture .badge.purple { background: #f3e8ff; color: #5b21b6; }
+div.tamsi_architecture .badge.orange { background: #ffedd5; color: #9a3412; }
+div.tamsi_architecture .badge.amber { background: #fef3c7; color: #92400e; }
+div.tamsi_architecture .badge.red { background: #fef2f2; color: #dc2626; }
+div.tamsi_architecture .badge.sky { background: #e0f2fe; color: #0369a1; }
+div.tamsi_architecture .flow-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 16px 0;
+  padding: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+div.tamsi_architecture .flow-diagram .step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 16px;
+  min-width: 100px;
+}
+div.tamsi_architecture .flow-diagram .step .step-label {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 4px;
+}
+div.tamsi_architecture .flow-diagram .step .step-box {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+div.tamsi_architecture .flow-diagram .connector {
+  font-size: 22px;
+  color: #94a3b8;
+  font-weight: bold;
+  padding: 0 4px;
+}
+div.tamsi_architecture hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 24px 0;
+}
+div.tamsi_architecture table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 13px;
+}
+div.tamsi_architecture th {
+  background: #f1f5f9;
+  text-align: left;
+  padding: 8px 12px;
+  font-weight: 600;
+  border-bottom: 2px solid #cbd5e1;
+}
+div.tamsi_architecture td {
+  padding: 6px 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+div.tamsi_architecture tr:hover td {
+  background: #f8fafc;
+}
+div.tamsi_architecture .note {
+  background: #fef9c3;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-size: 14px;
+}
+div.tamsi_architecture .note strong {
+  color: #92400e;
+}
+div.tamsi_architecture .footer-note {
+  text-align: center;
+  margin-top: 32px;
+  padding: 16px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 12px;
+  color: #94a3b8;
+}
+@media (max-width: 800px) {
+  div.tamsi_architecture .grid-2 { grid-template-columns: 1fr; }
+  div.tamsi_architecture .inheritance-flow { flex-direction: column; text-align: center; }
+  div.tamsi_architecture .flow-diagram { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<div class="tamsi_architecture">
+
+<h1>Tamsi Framework Architecture</h1>
+
+<div class="diagram-container">
+  <object data="tamsi_framework_architecture.svg" type="image/svg+xml" style="max-width:100%;height:auto;">
+    <img src="tamsi_framework_architecture.svg" alt="Tamsi Framework Architecture Diagram" style="max-width:100%;height:auto;">
+  </object>
+</div>
+
+<h2>Overview</h2>
+<p>Tamsi is a PHP Model-View-Controller (MVC) framework designed around a layered inheritance architecture. It provides a <strong>core framework</strong> (<code>tamsi/</code>) that is extended by an <strong>application layer</strong> (<code>app/</code>), and an <strong>auto-generated</strong> base layer (<code>usr_generated/</code>) that is extended by a <strong>user-customization</strong> layer (<code>usr/</code>). A code generator in <code>util/</code> introspects database tables and produces full MVC scaffolding including administrative CRUD interfaces.</p>
+
+<h2>Directory Structure</h2>
+
+<div class="dir-tree">
+<strong>Tamsi Framework</strong>
+│
+├── <span class="highlight">config/</span>              <span class="comment">// Configuration files</span>
+│   ├── Config.php              <span class="comment">// Configuration aggregator class</span>
+│   ├── database.cfg.php        <span class="comment">// Database connection settings</span>
+│   ├── main.cfg.php            <span class="comment">// Main app constants (OAuth, project)</span>
+│   ├── paths.cfg.php           <span class="comment">// Include and URL path definitions</span>
+│   ├── security.cfg.php        <span class="comment">// Security settings (CORS, CSP, etc.)</span>
+│   ├── routes.cfg.php           <span class="comment">// URL-to-controller route mapping</span>
+│   └── views.cfg.php           <span class="comment">// View rendering configuration</span>
+│
+├── <span class="highlight2">tamsi/</span>                <span class="comment">// Core framework (locked — no modifications)</span>
+│   ├── Core.php                <span class="comment">// Bootstrap core — starts session, loads Controller &amp; View</span>
+│   ├── Tamsi.php               <span class="comment">// Main framework class — extends Core</span>
+│   ├── <span class="highlight3">model/</span>                  <span class="comment">// Base models</span>
+│   │   ├── ModelBase.php
+│   │   ├── TamsiModel.php
+│   │   ├── TamsiPage.php
+│   │   ├── TamsiUser.php
+│   │   └── ...
+│   ├── <span class="highlight3">view/</span>                   <span class="comment">// Base views</span>
+│   │   ├── ViewBase.php
+│   │   ├── CoreView.php
+│   │   ├── TamsiView.php
+│   │   ├── PaginatorView.php
+│   │   └── ...
+│   └── <span class="highlight3">controller/</span>             <span class="comment">// Base controllers</span>
+│       ├── CoreController.php
+│       ├── TamsiController.php
+│       ├── TamsiEmailsController.php
+│       └── TamsiFilesController.php
+│
+├── <span class="highlight2">app/</span>                  <span class="comment">// Application-specific — extends tamsi/</span>
+│   ├── <span class="highlight3">model/</span>
+│   │   ├── Model.php            <span class="comment">// Extends TamsiModel</span>
+│   │   ├── Page.php
+│   │   ├── Role.php
+│   │   └── ...
+│   ├── <span class="highlight3">view/</span>
+│   │   ├── View.php             <span class="comment">// Extends TamsiView</span>
+│   │   ├── page.php
+│   │   ├── Javascript.php
+│   │   └── ...
+│   └── <span class="highlight3">controller/</span>
+│       ├── Controller.php       <span class="comment">// Extends TamsiController</span>
+│       ├── Security.php
+│       ├── EmailsController.php
+│       └── ...
+│
+├── <span class="highlight2">usr_generated/</span>        <span class="comment">// Auto-generated base (do NOT edit)</span>
+│   ├── <span class="highlight3">model/</span>
+│   │   ├── *Protected.php       <span class="comment">// Field-level access control layer</span>
+│   │   └── *Public.php          <span class="comment">// Public-facing model access</span>
+│   ├── <span class="highlight3">view/</span>
+│   │   ├── *ViewBase.php        <span class="comment">// Base view classes</span>
+│   │   └── *.tamsi.php          <span class="comment">// CRUD templates (edit, list, new)</span>
+│   └── <span class="highlight3">controller/</span>
+│       └── *Controller.php      <span class="comment">// Admin CRUD controllers</span>
+│
+├── <span class="highlight2">usr/</span>                  <span class="comment">// User customization — extends usr_generated/</span>
+│   ├── <span class="highlight3">model/</span>
+│   │   ├── [ModelName].php      <span class="comment">// Extends *Protected or *Public</span>
+│   │   └── ...
+│   ├── <span class="highlight3">view/</span>
+│   │   ├── [ModelName]View.php  <span class="comment">// Extends *ViewBase</span>
+│   │   └── *.rest.php           <span class="comment">// REST view templates (editable by user)</span>
+│   └── <span class="highlight3">controller/</span>
+│       └── [ModelName]Controller.php  <span class="comment">// Extends generated *Controller</span>
+│
+├── <span class="highlight2">util/</span>                  <span class="comment">// Code generation &amp; utilities</span>
+│   ├── generateMVC              <span class="comment">// Shell script — generates Model + View + Controller</span>
+│   ├── generateMVC.php          <span class="comment">// Web UI for MVC generation</span>
+│   ├── generateModel.php        <span class="comment">// Generates model files from DB schema</span>
+│   ├── generateView.php         <span class="comment">// Generates view templates</span>
+│   ├── generateController.php   <span class="comment">// Generates controller files</span>
+│   └── *.tem                    <span class="comment">// Template files used by generators</span>
+│
+├── <span class="highlight2">public_html/</span>           <span class="comment">// Web root / entry point</span>
+│   ├── index.php                <span class="comment">// Application entry point</span>
+│   ├── css/                     <span class="comment">// Stylesheets</span>
+│   ├── js/                      <span class="comment">// JavaScript</span>
+│   ├── images/                  <span class="comment">// Image assets</span>
+│   ├── lib/                     <span class="comment">// Frontend libraries (Bootstrap, jQuery, etc.)</span>
+│   └── Admin.dir/               <span class="comment">// Admin interface directory</span>
+│
+├── lib/                         <span class="comment">// PHP libraries &amp; vendor packages</span>
+├── db_util/                     <span class="comment">// Database utility scripts</span>
+├── composer.json
+└── vault.sql                    <span class="comment">// Database dump</span>
+</div>
+
+<h2>Architecture Layers</h2>
+
+<div class="grid-2">
+
+<div class="card config">
+  <h4>Config</h4>
+  <p><span class="badge amber">Configuration</span></p>
+  <p><strong>Purpose:</strong> Centralized configuration for the entire application.</p>
+  <ul>
+    <li><strong>Paths</strong> — include paths, URL base paths</li>
+    <li><strong>Database</strong> — connection credentials and DSN</li>
+    <li><strong>Routing</strong> — URL-to-controller mapping rules (<code>routes.cfg.php</code>)</li>
+    <li><strong>Security</strong> — CORS, CSP, authentication settings</li>
+    <li><strong>Constants</strong> — OAuth keys (Google, Facebook), app constants</li>
+    <li>Supports machine-specific overrides (<code>*.cfg.php.home</code>, <code>*.cfg.php.gahum</code>)</li>
+  </ul>
+</div>
+
+<div class="card tamsi locked">
+  <h4>tamsi/ &nbsp;<span class="badge blue">Core Framework</span></h4>
+  <p><strong>Purpose:</strong> Foundation MVC classes that define the framework contract.</p>
+  <ul>
+    <li><strong>No modifications allowed</strong> — shipped as a separate submodule</li>
+    <li>Defines <code>ModelBase</code>, <code>ViewBase</code>, <code>CoreController</code></li>
+    <li>Provides <code>TamsiModel</code>, <code>TamsiView</code>, <code>TamsiController</code> extension points</li>
+    <li>Includes pagination (<code>PaginatorView</code>), file handling, security models</li>
+  </ul>
+</div>
+
+<div class="card app">
+  <h4>app/ &nbsp;<span class="badge green">Application Layer</span></h4>
+  <p><strong>Purpose:</strong> Extends/overrides <code>tamsi/</code> classes. User-customizable.</p>
+  <ul>
+    <li><code>Model</code> extends <code>TamsiModel</code></li>
+    <li><code>View</code> extends <code>TamsiView</code></li>
+    <li><code>Controller</code> extends <code>TamsiController</code></li>
+    <li>Allows override of core behavior without touching <code>tamsi/</code></li>
+    <li>Contains app-specific models (Page, Role, Email, etc.)</li>
+  </ul>
+</div>
+
+<div class="card usrgen locked">
+  <h4>usr_generated/ &nbsp;<span class="badge pink">Auto-Generated Base</span></h4>
+  <p><strong>Purpose:</strong> Auto-generated base classes per database table.</p>
+  <ul>
+    <li>Generated by <code>util/generateMVC</code> from database schema</li>
+    <li><strong>Do NOT edit</strong> — regenerated whenever schema changes</li>
+    <li>Produces <code>*Protected.php</code> / <code>*Public.php</code> model pairs</li>
+    <li>Produces CRUD view templates (<code>edit_*.tamsi.php</code>, <code>list_*.tamsi.php</code>, <code>new_*.tamsi.php</code>)</li>
+    <li>Produces admin CRUD controllers</li>
+  </ul>
+</div>
+
+<div class="card usr">
+  <h4>usr/ &nbsp;<span class="badge purple">User Customization</span></h4>
+  <p><strong>Purpose:</strong> Extends <code>usr_generated/</code> classes with custom logic.</p>
+  <ul>
+    <li><code>[Model]</code> extends <code>*Protected</code> or <code>*Public</code></li>
+    <li><code>[Model]View</code> extends <code>*ViewBase</code></li>
+    <li><code>[Model]Controller</code> extends auto-generated <code>*Controller</code></li>
+    <li>User places custom business logic here</li>
+    <li>Survives regeneration — generated classes can be safely re-created</li>
+  </ul>
+</div>
+
+<div class="card util">
+  <h4>util/ &nbsp;<span class="badge orange">Code Generator</span></h4>
+  <p><strong>Purpose:</strong> Automates MVC scaffolding from database tables.</p>
+  <ul>
+    <li><code>generateMVC</code> — shell script that calls all three generators</li>
+    <li><code>generateModel.php</code> — inspects DB table schema, generates <code>*Protected</code> + <code>*Public</code> models</li>
+    <li><code>generateView.php</code> — generates CRUD view templates with Bootstrap UI</li>
+    <li><code>generateController.php</code> — generates admin CRUD controller with validation</li>
+    <li>Also generates administrative CRUD interfaces automatically</li>
+  </ul>
+</div>
+
+<div class="card public">
+  <h4>public_html/ &nbsp;<span class="badge sky">Web Root</span></h4>
+  <p><strong>Purpose:</strong> Application entry point and static assets.</p>
+  <ul>
+    <li><code>index.php</code> — forces HTTPS, bootstraps the <code>Tamsi</code> framework</li>
+    <li>CSS, JavaScript, images, fonts</li>
+    <li>Frontend libraries: Bootstrap 4, jQuery, Font Awesome, Owl Carousel, etc.</li>
+    <li>Admin directory for back-office interfaces</li>
+  </ul>
+</div>
+
+</div>
+
+<h2>Inheritance &amp; Extension Flow</h2>
+
+<p>The framework is built around a strict layering principle: <strong>extend, never modify the base</strong>. Two independent inheritance chains exist:</p>
+
+<div class="inheritance-flow">
+  <span class="box tamsi-box">tamsi/</span>
+  <span class="lock">🔒</span>
+  <span class="arrow">&#x2192; extends &#x2192;</span>
+  <span class="box app-box">app/</span>
+  <span class="arrow" style="font-size:26px;padding:0 12px;">&nbsp;&nbsp;&nbsp;</span>
+  <span class="box usrgen-box">usr_generated/</span>
+  <span class="lock">🔒</span>
+  <span class="gen-arrow">&#x2190; generates &#x2190;</span>
+  <span class="box util-box">util/</span>
+  <br style="flex-basis:100%;height:8px;">
+  <span style="padding:0 60px;"></span>
+  <span class="arrow">&#x2192; extends &#x2192;</span>
+  <span class="box usr-box">usr/</span>
+</div>
+
+<div class="note">
+  <strong>Golden Rule:</strong> Never edit <code>tamsi/</code> or <code>usr_generated/</code> directly. Always extend via <code>app/</code> (for core framework) or <code>usr/</code> (for table-specific logic). This ensures upgrades and regenerations are safe.
+</div>
+
+<h2>Code Generation Workflow</h2>
+
+<div class="flow-diagram">
+  <div class="step">
+    <div class="step-box" style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;">Database Table</div>
+    <span class="step-label">Source schema</span>
+  </div>
+  <div class="connector">&#x2192;</div>
+  <div class="step">
+    <div class="step-box" style="background:#ffedd5;color:#9a3412;border:1px solid #fed7aa;">./util/generateMVC<br><span style="font-size:11px;font-weight:400;">table_name</span></div>
+    <span class="step-label">Run script</span>
+  </div>
+  <div class="connector">&#x2192;</div>
+  <div class="step">
+    <div class="step-box" style="background:#fff1f2;color:#9d174d;border:1px solid #fda4af;">usr_generated/</div>
+    <span class="step-label">Auto-generated files</span>
+  </div>
+  <div class="connector">&#x2192;</div>
+  <div class="step">
+    <div class="step-box" style="background:#f5f3ff;color:#5b21b6;border:1px solid #c4b5fd;">usr/</div>
+    <span class="step-label">User customizes</span>
+  </div>
+</div>
+
+<h3>What generateMVC Produces</h3>
+
+<table>
+  <tr>
+    <th>Generator</th>
+    <th>Output Files</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>generateModel.php</code></td>
+    <td><code>usr_generated/model/<em>Table</em>Protected.php</code><br><code>usr_generated/model/<em>Table</em>Public.php</code></td>
+    <td>Two access layers — Protected (full access) and Public (read-only). Both map directly to database table columns.</td>
+  </tr>
+  <tr>
+    <td><code>generateController.php</code></td>
+    <td><code>usr_generated/controller/Tamsi<em>Table</em>Controller.php</code></td>
+    <td>Admin CRUD controller with create, read, update, delete, list, search operations. Includes field validation.</td>
+  </tr>
+  <tr>
+    <td><code>generateView.php</code></td>
+    <td><code>usr_generated/view/<em>Table</em>ViewBase.php</code><br><code>usr_generated/view/<em>table</em>/edit_<em>table</em>.tamsi.php</code><br><code>usr_generated/view/<em>table</em>/list_<em>table</em>.tamsi.php</code><br><code>usr_generated/view/<em>table</em>/new_<em>table</em>.tamsi.php</code></td>
+    <td>View base class and editable templates. The <code>.tamsi.php</code> files are Bootstrap-based UI templates for CRUD operations.</td>
+  </tr>
+</table>
+
+<div class="note">
+  <strong>Tip:</strong> Use <code>./util/generateMVC &lt;table_name&gt;</code> from the project root to generate scaffolding for any database table. For tables that only need model + controller (no views), use <code>./util/generateMC &lt;table_name&gt;</code> instead.
+</div>
+
+<h2>Request Lifecycle</h2>
+
+<ol>
+  <li><strong>User requests</strong> a URL, which hits <code>public_html/index.php</code></li>
+  <li><strong>index.php</strong> forces HTTPS, loads paths config, then instantiates <code>Tamsi</code> (from <code>tamsi/Tamsi.php</code>)</li>
+  <li><strong>Tamsi</strong> (extends <code>Core</code>) creates <code>Model</code>, <code>Controller</code> (with Model dependency), and <code>View</code></li>
+  <li><strong>Controller</strong> calls <code>receive()</code> to parse the request, <code>prepareMenu()</code> to build navigation</li>
+  <li><strong>View</strong> renders HTML — the controller's <code>displayInclude()</code> resolves the view path and includes it</li>
+  <li>Output is served back to the browser</li>
+</ol>
+
+<h2>Key Source Files</h2>
+
+<h3>Entry Point — <code>public_html/index.php</code></h3>
+<div class="code-block">
+<span class="cm">&lt;?php</span>
+<span class="kw">if</span>(!<span class="fn">isset</span>($_SERVER[<span class="str">"HTTPS"</span>]) || $_SERVER[<span class="str">"HTTPS"</span>] != <span class="str">"on"</span>) {
+    <span class="fn">header</span>(<span class="str">"Location: https://"</span> . $_SERVER[<span class="str">"HTTP_HOST"</span>] . $_SERVER[<span class="str">"REQUEST_URI"</span>], <span class="num">true</span>, <span class="num">301</span>);
+    <span class="kw">exit</span>;
+}
+<span class="fn">session_start</span>();
+<span class="fn">require_once</span> <span class="str">'../config/paths.cfg.php'</span>;
+$paths = <span class="kw">new</span> <span class="fn">Paths</span>();
+<span class="fn">require_once</span> <span class="str">'Tamsi.php'</span>;
+$tamsi = <span class="kw">new</span> <span class="fn">Tamsi</span>();
+<span class="cm">// ... renders HTML page with Bootstrap, header, sitemap, content, footer ...</span>
+$tamsi-&gt;view-&gt;<span class="fn">display</span>(MAIN_CONTAINER);
+</div>
+
+<h3>Main Framework Class — <code>tamsi/Tamsi.php</code></h3>
+<div class="code-block">
+<span class="kw">&lt;?php</span>
+<span class="fn">require_once</span> <span class="str">'__DIR__.'/../config/paths.cfg.php'</span>;
+<span class="fn">require_once</span> <span class="str">'Core.php'</span>;
+<span class="fn">require_once</span> <span class="str">'../app/view/View.php'</span>;
+<span class="fn">require_once</span> <span class="str">'../app/model/Model.php'</span>;
+<span class="fn">require_once</span> <span class="str">'../app/controller/Controller.php'</span>;
+
+$paths = <span class="kw">new</span> <span class="fn">Paths</span>();
+$paths-&gt;<span class="fn">init</span>();
+
+<span class="kw">class</span> <span class="fn">Tamsi</span> <span class="kw">extends</span> <span class="fn">Core</span>
+{
+    <span class="kw">public function</span> <span class="fn">__construct</span>(...) {
+        <span class="fn">session_start</span>();
+        $<span class="kw">this</span>-&gt;model = <span class="kw">new</span> <span class="fn">Model</span>();
+        $<span class="kw">this</span>-&gt;controller = <span class="kw">new</span> <span class="fn">Controller</span>($<span class="kw">this</span>-&gt;model);
+        $<span class="kw">this</span>-&gt;controller-&gt;<span class="fn">receive</span>();
+        $<span class="kw">this</span>-&gt;controller-&gt;<span class="fn">prepareMenu</span>();
+        $<span class="kw">this</span>-&gt;view = <span class="kw">new</span> <span class="fn">View</span>($<span class="kw">this</span>-&gt;controller);
+    }
+}
+</div>
+
+<h3>Application Controller — <code>app/controller/Controller.php</code></h3>
+<div class="code-block">
+<span class="kw">&lt;?php</span>
+<span class="fn">require_once</span> <span class="str">'TamsiController.php'</span>;
+
+<span class="kw">class</span> <span class="fn">Controller</span> <span class="kw">extends</span> <span class="fn">TamsiController</span>
+{
+    <span class="kw">public function</span> <span class="fn">__construct</span>(Model $model) {
+        <span class="kw">parent</span>::<span class="fn">__construct</span>($model);
+    }
+
+    <span class="kw">public function</span> <span class="fn">displayInclude</span>() {
+        $base_path = $<span class="kw">this</span>-&gt;model-&gt;<span class="fn">getBasePath</span>();
+        $path = $<span class="kw">this</span>-&gt;model-&gt;<span class="fn">getPath</span>();
+        <span class="kw">if</span> (!$<span class="kw">this</span>-&gt;<span class="fn">is_allowed_dir</span>($path) && ...) {
+            $_SESSION[<span class="str">'tamsi_notice'</span>] = <span class="str">'Requires login to view!'</span>;
+            <span class="kw">return</span> <span class="kw">false</span>;
+        }
+        <span class="cm">// ... includes the appropriate view file ...</span>
+    }
+}
+</div>
+
+<h3>Generated Controller — <code>usr_generated/controller/TamsiConfigurationsController.php</code></h3>
+<div class="code-block">
+<span class="kw">&lt;?php</span>
+<span class="fn">require_once</span> <span class="str">'TamsiSecurity.php'</span>;
+<span class="fn">require_once</span> <span class="str">'Configuration.php'</span>;
+<span class="fn">require_once</span> <span class="str">'Next.php'</span>;
+
+<span class="kw">class</span> <span class="fn">TamsiConfigurationsController</span>
+{
+    <span class="kw">public</span> $views;
+    <span class="kw">public</span> $security;
+
+    <span class="kw">public function</span> <span class="fn">__construct</span>($views) {
+        $<span class="kw">this</span>-&gt;views = $views;
+        $<span class="kw">this</span>-&gt;security = <span class="kw">new</span> <span class="fn">TamsiSecurity</span>();
+    }
+
+    <span class="kw">protected function</span> <span class="fn">validate</span>() {
+        <span class="cm">// Validates required fields, email format, etc.</span>
+    }
+    <span class="cm">// ... auto-generated CRUD methods ...</span>
+}
+</div>
+
+<h3>User Extension — <code>usr/controller/ConfigurationsController.php</code></h3>
+<div class="code-block">
+<span class="kw">&lt;?php</span>
+<span class="fn">require_once</span> <span class="str">'TamsiConfigurationsController.php'</span>;
+
+<span class="kw">class</span> <span class="fn">ConfigurationsController</span> <span class="kw">extends</span> <span class="fn">TamsiConfigurationsController</span>
+{
+    <span class="cm">// User adds custom logic here without modifying the generated base</span>
+}
+</div>
+
+<h3>Code Generator — <code>util/generateMVC</code></h3>
+<div class="code-block">
+<span class="cm">#!/bin/bash</span>
+php <span class="fn">generateModel.php</span> $1 $2 $3 $4
+php <span class="fn">generateController.php</span> $1 $2 $3 $4
+php <span class="fn">generateView.php</span> $1 $2 $3 $4
+</div>
+
+<h2>Config Overview</h2>
+
+<table>
+  <tr>
+    <th>File</th>
+    <th>Contents</th>
+  </tr>
+  <tr>
+    <td><code>config/Config.php</code></td>
+    <td>Aggregator class that loads <code>Paths</code> and <code>Secure_config</code> objects</td>
+  </tr>
+  <tr>
+    <td><code>config/paths.cfg.php</code></td>
+    <td>Defines <code>Paths</code> class with include paths, URL paths, and the <code>init()</code> method that registers autoloaders and sets PHP configuration</td>
+  </tr>
+  <tr>
+    <td><code>config/database.cfg.php</code></td>
+    <td>Database connection credentials and DSN</td>
+  </tr>
+  <tr>
+    <td><code>config/main.cfg.php</code></td>
+    <td>Global constants: <code>GOOGLE_CLIENT_ID</code>, <code>GOOGLE_CLIENT_SECRET</code>, <code>FACEBOOK_CLIENT_ID</code>, <code>FACEBOOK_CLIENT_SECRET</code>, <code>PROJECT</code>, <code>MAIN_CONTAINER</code>, and more. Supports machine-specific overrides via <code>main.cfg.php.home</code></td>
+  </tr>
+  <tr>
+    <td><code>config/security.cfg.php</code></td>
+    <td>Security settings — CORS headers, allowed origins, content security policies</td>
+  </tr>
+  <tr>
+    <td><code>config/routes.cfg.php</code></td>
+    <td>URL routing definitions — maps URL paths to controller commands and variables via the <code>Routes</code> class (extends <code>TamsiRoutes</code>)</td>
+  </tr>
+  <tr>
+    <td><code>config/views.cfg.php</code></td>
+    <td>View rendering options, template paths, layout configuration</td>
+  </tr>
+</table>
+
+<h2>Summary of Architecture Rules</h2>
+
+<table>
+  <tr>
+    <th>Layer</th>
+    <th>Can Edit?</th>
+    <th>Purpose</th>
+    <th>Extends</th>
+  </tr>
+  <tr>
+    <td><code>tamsi/</code></td>
+    <td><span class="badge red">No</span></td>
+    <td>Core framework — defines base classes and framework contract</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td><code>app/</code></td>
+    <td><span class="badge green">Yes</span></td>
+    <td>Customize core behavior; override framework classes</td>
+    <td><code>tamsi/</code></td>
+  </tr>
+  <tr>
+    <td><code>usr_generated/</code></td>
+    <td><span class="badge red">No</span></td>
+    <td>Auto-generated base classes per database table</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td><code>usr/</code></td>
+    <td><span class="badge green">Yes</span></td>
+    <td>Customize table-specific behavior; override generated classes</td>
+    <td><code>usr_generated/</code></td>
+  </tr>
+  <tr>
+    <td><code>util/</code></td>
+    <td><span class="badge green">Yes</span></td>
+    <td>Code generation scripts and templates</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td><code>config/</code></td>
+    <td><span class="badge green">Yes</span></td>
+    <td>Application configuration settings</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td><code>public_html/</code></td>
+    <td><span class="badge green">Yes</span></td>
+    <td>Web root, static assets, entry point</td>
+    <td>—</td>
+  </tr>
+</table>
+
+<div class="footer-note">
+  Tamsi Framework &mdash; author: Edgardo Fabian &mdash; license: GPL v3
+</div>
+
+</div>
+</body>
+</html>

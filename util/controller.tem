@@ -1,0 +1,62 @@
+require_once '[CLASS_NAME].php';
+require_once 'Next.php';
+class Tamsi[CONTROLLER_NAME]Controller 
+{
+    public $views;
+	[SECURITY]
+    
+[LOGIN_REGISTER_LOGOUT]
+[NEW_EDIT]
+[UPLOAD_IMAGE]
+
+    public function save($[TABLE_ELEMENT])
+    {
+        if ($[TABLE_ELEMENT]->save()>0)
+        {
+
+           $message="Successfully saved ".$[TABLE_ELEMENT]->getName();
+           $success=true;
+           
+        } else
+        {
+           $message='SQL Error! '.$_SESSION['tamsi_notice'];
+           $success=false;
+        }
+        
+        $response = array('message'=>$message,'success'=>$success,'id'=>$[TABLE_ELEMENT]->getId());    
+        return $response;
+    }
+
+    public function deleteSelectedRestAction()
+    {
+        $ret = 0;
+        $message = 'No id selected.';
+        if (array_key_exists('delete_selected',$_POST))
+        {
+            $delete_selected = $_POST['delete_selected'];
+
+            if (count($delete_selected)>0)
+            {
+                $[TABLE_ELEMENT] = new [CLASS_NAME]();
+                $filter=array('id'=>$delete_selected);
+                $ret = $[TABLE_ELEMENT]->deleteAll($filter);
+                $message = $_SESSION['tamsi_notice'];
+            }
+        }
+        $response = array('message'=>$message,'success'=>$ret);
+        $this->json_response($response);
+    }
+
+    public function json_response($response)
+    {
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit();           
+    }
+    
+    public function bool_response($response)
+    {
+        $_SESSION['tamsi_notice']=$response['message'];
+        return $response['success'];
+    }
+}

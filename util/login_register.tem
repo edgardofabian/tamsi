@@ -1,0 +1,457 @@
+    public function loginAction($check_field)
+    {
+        $check_value = $_POST[$check_field];
+        $password = $_POST['password'];    
+        if ($_SESSION['user_id']==0)
+        {
+            $[TABLE_ELEMENT] = new [CLASS_NAME]();
+            $[TABLE_ELEMENT]->set[PRIMARY_FUNCTION](0);
+            $[TABLE_ELEMENT] = $[TABLE_ELEMENT]->find(array($check_field=>$check_value));
+            if ($user->get[PRIMARY_FUNCTION]()>0)
+            {
+                $secure = new Secure_config();
+                
+                if ($this->security->verifyPassword($password,$[TABLE_ELEMENT]->getSalt(),$secure->secret_key,$[TABLE_ELEMENT]->getPassword()))
+                {
+                    $[TABLE_ELEMENT]=$this->login($[TABLE_ELEMENT],$secure);
+                    return $[TABLE_ELEMENT];
+                } else
+                {
+                    $_SESSION['tamsi_notice']='Sorry invalid credentials!';
+                }
+            } else
+            {
+                $_SESSION['tamsi_notice']='Identity not found!';
+            }
+        } else 
+        {
+            $_SESSION['tamsi_notice']='';
+        }
+        
+        $view_config = new Views(); 
+        $views = $view_config->views;
+        return $views;
+	}
+
+    public function loginJwtAction($check_field)
+    {
+        $secret_key = JWT_KEY; 
+        $issued_at = time();
+        $expiration_time = $issued_at + 3600; // Valid for 1 hour
+
+        $check_value = $_POST[$check_field];
+        $password = $_POST['password'];    
+        $success = false;
+        $message = '';
+        if ($_SESSION['user_id']==0)
+        {
+            $user = new User();
+            $user->setId(0);
+            $user = $user->find(array($check_field=>$check_value));
+            if ($user->getId()>0)
+            {
+                $secure = new Secure_config();
+                
+                if ($this->security->verifyPassword($password,$[TABLE_ELEMENT]->getSalt(),$secure->secret_key,$[TABLE_ELEMENT]->getPassword()))
+                {
+                    $success = true;
+                    $payload = [
+                            "iat" => $issued_at,
+                            "exp" => $expiration_time,
+                            "data" => [
+                                "id" => $user->id
+                            ]
+                        ];
+                    $jwt = JWT::encode($payload, $secret_key, 'HS256');
+                } else
+                {
+                    $message='Sorry invalid credentials!';
+                }
+            } else
+            {
+                $message='Identity not found!';
+            }
+        } else 
+        {
+            $message='';
+        }
+        if ($success)
+        {
+            $ret = array('success'=>$success,'token'=>$jwt);
+            echo json_encode($ret);
+        } else
+        {
+            $ret = array('success'=>$success,'message'=>$message);
+            http_response_code(401);
+            echo json_encode($ret);
+        }
+        exit;
+
+	}
+
+    public function login($[TABLE_ELEMENT],$secure)
+    {
+        $now = new DateTime('NOW');
+        $[TABLE_ELEMENT]->setLogin($now->format('Y-m-d H:i:s'));
+        $[TABLE_ELEMENT]->setLoginip($_SERVER['REMOTE_ADDR']);          
+        $[TABLE_ELEMENT]->save();
+              
+        $_SESSION['user_id']=$[TABLE_ELEMENT]->getId();
+        $_SESSION['user_name']=$[TABLE_ELEMENT]->getFirstname().' '.$[TABLE_ELEMENT]->getLastname();
+        $_SESSION['user_email']=$[TABLE_ELEMENT]->getEmail();
+        $_SESSION['user_role']=$[TABLE_ELEMENT]->getRole();
+        $_SESSION['user_domain']=$secure->domain;
+        $_SESSION['tamsi_notice']='Welcome '.$_SESSION['user_name'].'!';
+        $_SESSION['site_map']='';
+        return $[TABLE_ELEMENT];
+    }
+    
+    public function logoutAction()
+    {
+        $_SESSION['user_id']=0;
+        $_SESSION['user_name']=0;
+        $_SESSION['user_email']=0;
+        $_SESSION['user_role']=0;
+        $_SESSION['user_domain']='';
+        $_SESSION['tamsi_notice']="Successful logout!";
+        $view_config = new Views(); 
+        $views = $view_config->views;
+        return $views;
+	} 
+    
+    public function registerRestAction()
+    {
+		$[TABLE_ELEMENT]= new [CLASS_NAME]();
+		$[TABLE_ELEMENT]= $this->getPostNew($[TABLE_ELEMENT]);
+        $response = $this->save_new_user($[TABLE_ELEMENT]);
+        if ($response['success'])
+        {
+            $message='Please monitor your email to confirm your registration.';
+            $response['message']=$response['message']."\r\n".$message;
+            
+            $next = new Next();
+            $next->silent = 0;
+            $next->url = '?command=registerConfirmSendLinkRest&object=User&id='.$response['id'];
+            $next->container = 'div.page';
+            $next->form = '#register_user';
+            $response['next']=$next;
+        }
+        $this->json_response($response);
+    }
+    
+    protected function sendLink($[TABLE_ELEMENT],$command,$msg)
+    {
+        require_once 'Email.php';
+        $config = new Configurations();
+        $response=array();
+        if ($[TABLE_ELEMENT]->getId())
+        {
+            
+            
+            if (trim($[TABLE_ELEMENT]->getResetKey()))
+            {
+                $key=$[TABLE_ELEMENT]->getResetKey();
+            }
+            else
+            {
+                $key = $this->security->generateKey(32);
+                $[TABLE_ELEMENT]->setResetkey($key);
+            }            
+            
+            $email = new Email();
+            $email->setSubject('Password Reset');
+            if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] != 'off')) 
+            {
+                $ht = 'https';
+            } else
+            {
+                $ht='http';
+            }
+            $config_paths = new Paths();
+            
+            $link = $ht.'://'.$config->domain.'/?command='.$command.'&object=User&email='.$[TABLE_ELEMENT]->getEmail().'&resetkey='.urlencode($[TABLE_ELEMENT]->getResetkey());            
+            $msg.=$link;
+            $email->setMessage($msg);
+            $email->addTo($user->getEmail());
+            if ($config->office_email)
+			{
+				$email->addFrom($config->office_email);
+			}
+            if ($[TABLE_ELEMENT]->save())
+            {
+                if ($email->send())
+                {
+                    
+                    $message='Reset details emailed to your primary email account.';
+                    $success=TRUE;
+                } else
+                {
+                    $message='Email send error!';
+                    $success=false;
+                }
+            } else
+            {
+                $message='Unable to update user!';
+                $success=false;
+            }
+        } else
+        {
+            $message='Unknown user!';
+            $success=false;
+        }    
+        return array('success'=>$success,'message'=>$message);
+    }
+
+    public function registerConfirmSendLinkRestAction()
+    {
+        $id = $_GET['id'];
+        if (!$id)
+        {
+            $message='User Id not provided!';
+            $success=false;
+        }
+        $[TABLE_ELEMENT]= new [CLASS_NAME]();
+        $[TABLE_ELEMENT] = $[TABLE_ELEMENT]->find(array('id'=>$id));
+        $msg="To confirm your account, please visit the link below:\r\n";
+        $response = $this->sendLink($[TABLE_ELEMENT],'registrationConfirm',$msg);    
+        $this->json_response($response);
+    }
+    
+
+    public function forgotPasswordSendLinkAction()
+    {
+        $email = $_REQUEST['email'];
+        if (!$email)
+        {
+            $_SESSION['tamsi_notice']='Email not provided!';
+            return false;
+        }
+        $[TABLE_ELEMENT]= new [CLASS_NAME]();
+        $[TABLE_ELEMENT] = $[TABLE_ELEMENT]->find(array('email'=>$email));
+        $msg="To reset your password please visit the link below:\r\n";
+        $response = $this->sendLink($[TABLE_ELEMENT],'forgotPasswordReceive',$msg);    
+        if ($response['success'])
+        {
+            $_SESSION['tamsi_notice']=$response['message'];
+            return $[TABLE_ELEMENT];
+        }    
+        else
+        {
+            $_SESSION['tamsi_notice']=$response['message'];
+            return FALSE;
+        }
+    }
+    
+    public function forgotPasswordReceiveActionGet()
+    {
+		$email = $_REQUEST['email'];
+		$key = $_REQUEST['resetkey'];
+		$[TABLE_ELEMENT]= new [CLASS_NAME]();
+        $[TABLE_ELEMENT]->find(array('email'=>$email));
+        $user_key = $[TABLE_ELEMENT]->getResetkey();
+        if (($key==$user_key) || ($user->getId()==$_SESSION['user_id'])) 
+        {
+            $secure = new Secure_config();
+            $[TABLE_ELEMENT]->setResetkey('');
+            $[TABLE_ELEMENT]=$this->login($[TABLE_ELEMENT],$secure);
+            $_SESSION['user_required_action']='change_password';
+            $_SESSION['tamsi_notice']='Please update your password through your profile!';
+            
+            $paths = new Paths();
+            $_GET['id']=$user->getId();
+			return $paths->admin.'/Users.dir/Edit User.hid.rest.php';
+        } else
+        {
+			$_SESSION['user_id']=0;
+			$_SESSION['user_name']=0;
+			$_SESSION['user_email']=0;
+			$_SESSION['user_role']=0;
+			$_SESSION['user_required_action']='';
+			$_SESSION['tamsi_notice']='Invalid Credentials or link may have been used already!';
+			return false;			
+        }
+	}
+
+    public function registrationConfirmActionGet()
+    {
+		$email = $_REQUEST['email'];
+		$key = $_REQUEST['resetkey'];
+		$[TABLE_ELEMENT]= new [CLASS_NAME]();
+        $[TABLE_ELEMENT]->find(array('email'=>$email));
+        $user_key = $[TABLE_ELEMENT]->getResetkey();
+        if (($key==$user_key) || ($user->getId()==$_SESSION['user_id'])) 
+        {
+            $role = new Role();
+            $role_value=0;
+            if (defined('DEFAULT_REGISTRATION_ROLE'))
+            {
+                $role_value = $role->getValueFromName(DEFAULT_REGISTRATION_ROLE);
+            }
+            $[TABLE_ELEMENT]->setRole($role_value);
+            $[TABLE_ELEMENT]->setResetkey('');
+            $secure = new Secure_config();
+            
+            $[TABLE_ELEMENT]=$this->login($[TABLE_ELEMENT],$secure);
+            $_SESSION['user_required_action']='change_password';
+            $_SESSION['tamsi_notice']='Please update your password through your profile!';
+            
+            $paths = new Paths();
+            $_GET['id']=$user->getId();
+			$views = array();
+            $views['MAIN_CONTAINER']=$paths->admin.'/Users.dir/Edit User.hid.rest.php';
+            return $views;
+        } else
+        {
+			$_SESSION['user_id']=0;
+			$_SESSION['user_name']=0;
+			$_SESSION['user_email']=0;
+			$_SESSION['user_role']=0;
+			$_SESSION['user_required_action']='';
+			$_SESSION['tamsi_notice']='Invalid Credentials or link may have been used already!';
+            $_SESSION['site_map']='';
+			return false;			
+        }
+	}
+
+	public function updatePasswordAction()
+    {
+		$[TABLE_ELEMENT]= new [CLASS_NAME]();
+
+		$[TABLE_ELEMENT] = $[TABLE_ELEMENT]->find(array('id'=>$_REQUEST['id']));
+		$password = $_REQUEST['password'];
+        $confirm_password = $_REQUEST['confirm_password'];
+        if ((strlen($[TABLE_ELEMENT]->getEmail())>0) && (strcmp($password,$confirm_password)==0) && (strlen($password)>3))
+        {
+            $secure = new Secure_config();
+            $[TABLE_ELEMENT]->setSalt($this->security->generateSalt(10));
+            $[TABLE_ELEMENT]->setPassword($this->security->generateHash($confirm_password,$[TABLE_ELEMENT]->getSalt(),$secure->secret_key));
+            $now = new DateTime('NOW');
+            $[TABLE_ELEMENT]->setModified($now->format('Y-m-d H:i:s'));
+            $[TABLE_ELEMENT]->setUpdateip($_SERVER['REMOTE_ADDR']);
+            $[TABLE_ELEMENT]->setResetkey('');
+            if ($[TABLE_ELEMENT]->save()>0)
+            {
+                $_SESSION['tamsi_notice']='Password successfully updated!';
+                return $[TABLE_ELEMENT];
+            } else
+            {
+                $_SESSION['tamsi_notice']='Password update error!';
+                return false;
+            }
+        } else
+        {
+            $_SESSION['tamsi_notice']='Password mismatched!';
+            return false;
+        }
+    }
+    
+    public function testDriveAction()
+    {
+        $config = new Configurations();
+        $role = new Role();
+        if (defined('ENABLE_TEST_DRIVE') && ENABLE_TEST_DRIVE)
+        {
+            if (array_key_exists('email',$_POST) && trim($_POST['email']))
+            {
+                $message='';
+                $test_role = strtolower(ENABLE_TEST_DRIVE);
+                $user = new User();
+                $email_add = strip_tags(trim($_POST['email']));
+                
+                $user->find(array('email'=>$email_add));
+                
+                $key = $this->security->generateKey(32);
+                if ($user->getId())
+                {
+                    $message="You already have an existing account. Now setting to $test_role. ";
+                    $user->setRole($role->$test_role);
+                    if (!trim($user->getResetKey()))
+                    {
+                        $user->setResetkey($key);
+                    }
+                }
+                else
+                {
+                    $user->setEmail($email_add);
+                    $names=array('test',ENABLE_TEST_DRIVE);
+                    $pos_at = strpos($email_add,'@');
+                    if ($post_at)
+                    {
+                        $name=substr($email_add,0,$post_at+1);
+                        $names=array($name,ENABLE_TEST_DRIVE);
+                        if (strpos($name,'.'))
+                        {
+                            $names=explode('.',$name);
+                        }
+                        else if (strpos($name,'_'))
+                        {
+                            $names=explode('.',$name);
+                        }
+                    }
+                    $user->setFirstname($names[0]);
+                    if (count($names)>1)
+                    {
+                        $user->setLastname($names[1]);
+                    }
+                    
+                    $user->setResetkey($key);
+                }    
+                
+                
+                $config = new Configurations();
+                $email = new Email();
+                $email->setSubject('Test as doctor');
+                if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] != 'off')) 
+                {
+                    $ht = 'https';
+                } else
+                {
+                    $ht='http';
+                }
+                $config_paths = new Paths();
+                
+                $link = $ht.'://'.$config->domain.'/?command=forgotPasswordReceive&object=User&email='.$user->getEmail().'&resetkey='.urlencode($user->getResetkey());            
+                
+                $msg="To automatically login please click the one-time login link below:<br>".$link;
+                $email->setMessage($msg);
+                $email->addTo($email_add);
+                if ($config->office_email)
+                {
+                    $email->addFrom($config->office_email);
+                }
+                if ($user->save())
+                {
+                    if ($email->send())
+                    {
+                        
+                        $message.='Login details emailed to your '.$email_add.' email account.';
+                        $success=TRUE;
+                    } else
+                    {
+                        $message.='Email send error!';
+                        $success=FALSE;
+                    }
+                } else
+                {
+                    $message='Unable to update user! '.$_SESSION['tamsi_notice'];
+                    $success=FALSE;
+                }
+        
+                $response = array('success'=>$success,'message'=>$message);
+            }
+            else
+            {
+                $response = array('success'=>FALSE,'message'=>'Missing email!');
+            }
+        }
+        else
+        {
+            $response = array('success'=>FALSE,'message'=>'Unsupported method!');
+        }
+        $_SESSION['site_map']='';
+        return $this->json_response($response);
+    }  
+
+[GOOGLE_LOGIN]
+    
+[FACEBOOK_LOGIN]

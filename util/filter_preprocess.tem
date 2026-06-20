@@ -1,0 +1,18 @@
+		if (!isset($this->select_filters)) $this->select_filters=array();
+        if (isset($_REQUEST['[TABLE_NAME]_select_filters']))
+        {
+            foreach($_REQUEST['[TABLE_NAME]_select_filters'] as $key=>$value)
+            {
+                if (!(is_numeric($key)) && in_array($key,$valid_filters))
+                {
+                    $this->select_filters[$key] = $value;
+                }
+            }
+            $_SESSION['list_[TABLE_NAME]']['select_filters']=$this->select_filters;
+        }
+        else
+        {
+            $this->select_filters=array_merge($_SESSION['list_[TABLE_NAME]']['select_filters'],$this->select_filters);
+        }
+        
+        

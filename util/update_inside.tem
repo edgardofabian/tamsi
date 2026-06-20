@@ -1,0 +1,28 @@
+        if ((count($data)>0) && (array_key_exists('id',$data) || ($this->id>0)))
+        {
+            return parent::update($data);
+        } else
+        {
+            $mysqli = new mysqli($this->db->host,$this->db->user, $this->db->password, $this->db->name);
+            if ($mysqli->connect_errno) 
+            {
+                $_SESSION['tamsi_notice'].="Connect failed: ".$mysqli->connect_error." \r\n";
+                return false;
+            } 
+            
+            $sql="UPDATE [TABLE] SET ";        
+            $updates = '';
+            
+[ALL_UPDATES]
+
+
+            $mysqli->query($sql);
+            if ($mysqli->error)
+            {
+                $_SESSION['tamsi_notice'].="Errormessage: ".$mysqli->error."  \r\n";
+                return false;
+            } 
+            $mysqli->close();
+            return true;
+        }
+

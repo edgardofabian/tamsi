@@ -1,0 +1,114 @@
+<script>
+$(document).ready(function() 
+{
+    var sort_filters = [<?php
+                        $i=0;
+                        foreach ($sort_orders as $order) 
+                        {
+                            if ($i==0)
+                            {
+                                echo "'$order'";
+                            } else echo ",'$order'";
+                            $i=$i+1;
+                        }?>];
+    $('input.sort_order').val(sort_filters.toString());
+    $('form').find('select').each( function()
+    {
+        $(this).change( function()
+        {
+            if ($(this).hasClass('sort'))
+            {
+                var index = sort_filters.indexOf($(this).attr('field'));
+                if (index>=0)
+                {
+                    sort_filters.splice(index, 1);
+                } 
+                if (($(this).val()=='ASC')||($(this).val()=='DESC'))
+                {
+                    sort_filters.unshift(sort_handle.attr('field'));
+                }
+                if ($(this).val()=='ASC') 
+                {
+                    if ($(this).hasClass('fa-sort'))
+                    {
+                        $(this).removeClass('fa-sort');
+                    }
+                    if ($(this).hasClass('fa-sort-desc'))
+                    {
+                        $(this).removeClass('fa-sort-desc');
+                    }
+                    $(this).addClass('fa-sort-asc');
+                } else if ($(this).val()=='DESC')
+                {
+                    if ($(this).hasClass('fa-sort'))
+                    {
+                        $(this).removeClass('fa-sort');
+                    }
+                    if ($(this).hasClass('fa-sort-asc'))
+                    {
+                        $(this).removeClass('fa-sort-asc');
+                    }
+                    $(this).addClass('fa-sort-desc');                    
+                } else
+                {
+                    if ($(this).hasClass('fa-sort-asc'))
+                    {
+                        $(this).removeClass('fa-sort-asc');
+                    }
+                    if ($(this).hasClass('fa-sort-desc'))
+                    {
+                        $(this).removeClass('fa-sort-desc');
+                    }
+                    $(this).addClass('fa-sort');                    
+                }
+                
+            }
+            if (sort_filters.length>0)
+            {
+                //$sort_order = $('<input type="hidden" name="sort_order" value="'+sort_filters.toString()+'" />');
+                //$('#form1').append($sort_order);
+                $('input.sort_order').val(sort_filters.toString());
+            }
+            $('#form1').submit();
+        });
+        if ($(this).hasClass('sort'))
+        {
+            if ($(this).val()=='ASC') 
+            {
+                if ($(this).hasClass('fa-sort'))
+                {
+                    $(this).removeClass('fa-sort');
+                }
+                if ($(this).hasClass('fa-sort-desc'))
+                {
+                    $(this).removeClass('fa-sort-desc');
+                }
+                $(this).addClass('fa-sort-asc');
+            } else if ($(this).val()=='DESC')
+            {
+                if ($(this).hasClass('fa-sort'))
+                {
+                    $(this).removeClass('fa-sort');
+                }
+                if ($(this).hasClass('fa-sort-asc'))
+                {
+                    $(this).removeClass('fa-sort-asc');
+                }
+                $(this).addClass('fa-sort-desc');                    
+            } else
+            {
+                if ($(this).hasClass('fa-sort-asc'))
+                {
+                    $(this).removeClass('fa-sort-asc');
+                }
+                if ($(this).hasClass('fa-sort-desc'))
+                {
+                    $(this).removeClass('fa-sort-desc');
+                }
+                $(this).addClass('fa-sort');                    
+            }
+            
+        }        
+    });
+});
+</script>

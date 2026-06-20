@@ -1,0 +1,21 @@
+    public function newAction()
+    {
+        $this->setNewRequirements();
+        $response = $this->create();
+        return $this->bool_response($response);
+    }
+
+    public function editAction()     
+    {
+        $this->setEditRequirements();
+        $response = $this->edit();
+        return $this->bool_response($response);
+    }
+    
+    public function deleteAction()     
+    {
+        $this->setDefaultIdRequirements();
+        $response = $this->delete();
+        return $this->bool_response($response);
+    }   
+    

@@ -1,0 +1,41 @@
+    public  function insertAll($[TABLE])
+    {
+        $mysqli = new mysqli($this->db->host,$this->db->user, $this->db->password, $this->db->name);
+        if ($mysqli->connect_errno) 
+        {
+            $_SESSION['tamsi_notice'].="Connect failed: ".$mysqli->connect_error." \r\n";
+            return false;
+        } 
+        
+        $sql="INSERT INTO [TABLE] ([FIELDS]) VALUES ";
+        
+        $last = count($[TABLE]);
+        $i=0;
+        foreach($[TABLE] as $i=>$[TABLE_ELEMENT])
+        {
+            $i=$i+1;
+
+[ESCAPED_INSERT_ALL]
+            
+            if ($i<$last)
+            {
+                $sql.="[VALUES], ";
+            } else
+            {
+                $sql.="[VALUES]; ";
+            }
+        }
+        $mysqli->query($sql);
+        if ($mysqli->error)
+        {
+            $_SESSION['tamsi_notice'].="Errormessage: ".$mysqli->error."  \r\n";
+            return false;
+        } else
+        {
+            $this->affected_rows = $mysqli->affected_rows;
+        }
+        $mysqli->close();
+        return true;
+        
+
+    }

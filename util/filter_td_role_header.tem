@@ -1,0 +1,26 @@
+    public function render_[FILTER_FIELD]_filter()
+    {
+		echo "<!-- ".json_encode($this->select_filters)." --> \r\n";
+		echo "<select  class='filter' name='[TABLE_NAME]_select_filters[role]' value='' > \r\n";
+		echo "<option value=''>All</option> \r\n";
+		
+		$role = new Role();
+		
+		foreach ($role->getRoleNames() as $val=>$name)
+		{
+			
+			if ((array_key_exists('role',$this->select_filters)) && ($this->select_filters['role']) && in_array($val,$this->select_filters['role']))
+			{
+				echo "<option selected='selected' value='".$val."' >".$name."</option>";
+			} else if (($val==0) && (in_array("(role < 1)",$this->select_filters))) 
+			{
+				echo "<option selected='selected' value='".$val."' >".$name."</option>";
+			} 
+			else
+			{
+				echo "<option value='".$val."' >".$name."</option>";
+			}
+		}
+		echo "</select> \r\n";		
+	}
+	

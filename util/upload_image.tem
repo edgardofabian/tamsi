@@ -1,0 +1,64 @@
+    public function uploadImageAction()
+    {
+		$[TABLE_ELEMENT] = $this->get[CLASS_NAME]();;
+        $this->uploadImage($[TABLE_ELEMENT]);
+        if (isset($_POST['redirect']) && $_POST['redirect'])
+        {
+            $url = $_POST['redirect'];
+            header('Location: '.$url);
+            exit();
+        }        
+    }
+    
+    public function generateImageName($[TABLE_ELEMENT],$folder)
+    {
+        $name = str_replace(',','_',str_replace(' ','',strip_tags($[TABLE_ELEMENT]->getId().'_[TABLE]')));
+        $name=strtolower($name).($folder?'_'.$folder:'');    
+        return $name;
+    }
+    
+    protected function uploadImage($[TABLE_ELEMENT],$folder='',$force_png=TRUE,$max_width=480)
+    {
+        $current_image = $[TABLE_ELEMENT]->getImage($folder);
+        if (!(strpos($current_image,'none.png')>0))  unlink($current_image);
+        if (!$folder) 
+        {
+            $current_icon_image = $[TABLE_ELEMENT]->getImageIcon($folder);
+            if (!(strpos($current_icon_image,'none_icon.png')>0))  unlink($current_icon_image);
+        }
+        $filename = $this->generateImageName($[TABLE_ELEMENT],$folder);
+        
+        $paths = new Paths();
+        $ext = strtolower(strrchr($_FILES["file"]["name"], '.'));
+        $image = new TamsiImage();
+        $image->setFilename($filename.$ext);
+        $image->setPath($paths->user_image."[TABLE]/");
+        
+        if ($image->save())
+        {
+            $method='';
+            if ($max_width && ($image->getWidth() > $max_width))
+            {
+                $image->setWidth(480);
+                $method='force_width';
+            }
+            if (($ext!='.png')&&($force_png)&&($ext!='.svg')||($method)) //allow only png and svg
+            {
+                $image->resize($method); //all image must be stored as png
+                $ext='.png';
+            }
+            if (!$folder) $this->createIcon($image,$filename);
+            $_SESSION['tamsi_notice'].='Successfully uploaded image';
+            return $filename.$ext;
+        } else
+        {
+            $_SESSION['tamsi_notice'].='Cannot save image!';
+            return false;
+        }
+        
+    }
+    
+    protected function createIcon($image,$name)
+    {
+        $image->createIcon('64','64',$name.'_icon.png');    
+    }

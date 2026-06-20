@@ -1,0 +1,49 @@
+    public function __construct()
+    {
+        parent::__construct();
+        $this->table = '[TABLE]';
+        $this->column_types = json_decode('[COLUMN_TYPES]',TRUE);
+        $this->columns = array_keys($this->column_types);
+[SECURITY]
+       return $this;
+    }
+ 
+    
+     
+    public function findAll($filter=array(),$orders=array(),$limit=100000,$page=1,$select=array(),$debug=false)
+    {
+        $mysqli = new mysqli($this->db->host,$this->db->user, $this->db->password, $this->db->name);
+        if ($mysqli->connect_errno) 
+        {
+            $_SESSION['tamsi_notice'].="Connect failed: ".$mysqli->connect_error." \r\n";
+            return array();
+        }   
+        
+        $sql = $this->generateFindAllSql($mysqli,$filter,$orders,$limit,$page,$select,$debug);
+             
+        
+        $res = $mysqli->query($sql);
+    
+        $[ELEMENT_ARRAY] = array();
+        
+        if ($mysqli->affected_rows>0)
+        {
+            while ($row = $res->fetch_array())
+            {
+                $[TABLE_ELEMENT]= new [CLASS_NAME]();
+                foreach($row as $[TABLE_ELEMENT]_field=>$[TABLE_ELEMENT]_value)
+                {
+                    if (in_array($[TABLE_ELEMENT]_field,$[TABLE_ELEMENT]->columns))
+                    {
+                        $[TABLE_ELEMENT]->$[TABLE_ELEMENT]_field = $[TABLE_ELEMENT]_value;
+                    }
+                }
+                $[ELEMENT_ARRAY][]=$[TABLE_ELEMENT];
+            }
+        } else
+        {
+
+        }
+        $mysqli->close();
+        return $[ELEMENT_ARRAY];
+    } 

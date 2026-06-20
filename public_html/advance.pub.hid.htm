@@ -1,0 +1,478 @@
+    <?php
+    require_once 'UserView.php';
+    ?>
+    <div style="height:60px"></div>
+    <div class="art-content-layout" >
+        <div style="display:inline-block" ></div>
+        <div style="display:inline-block;vertical-align:top" >
+            <h1>Advance Topics in Maya</h1>            
+        </div>
+    </div>
+    <div style="height:40px"></div>
+    <div class="art-content-layout" id="design_db" >
+        <div style="display:inline-block" >
+            <h2>1. Associating Menus and Buttons Clicks to Views or Controllers</h2>
+
+            <h3>1.1 Associating clicks to a View</h3>
+			<ul>
+            <li>Maya framework allows you to load a view without any direct controller.</li> 
+            <li>The utility generateView.php automatically can generates views at ../usr_generated/view and you can extend/override it at ../usr/view. </li>
+            <li><b>DO NOT EDIT</b> the files inside <b>../usr_generate</b> because if you have modifications these will be overwritten by the view you generate using generateView.php utility.</li>
+            <li>You are only allowed to modify the codes in ../usr/view folder.</li>
+            <li>When user is currently logged-in, any view file can be loaded directly without controllers but when not, only files with `.pub.` which means public can be loaded like advance.pub.htm</li>
+            </ul>
+            <p>There are basically 2 methods load a view using menus</p>
+            <h4>1.1.1 Load Html Result of View to a Container Element (Ajax)</h4>
+            <p>A sample linking of 'a' to a view file sample.pub.htm</p>
+            <?php 
+            $sample_link = '<a class="button mx-" mx-container="div.page"  mx-click="?command=display_rest&base_path=&path=sample.pub.htm" href="#"><li class="fa fa-star"></li> Sample</a>';
+            echo '<p style="font-weight:bold">'.htmlentities($sample_link).'</p>'; 
+            echo '<p>This will render as shown below: (clicking this will get as back to this exact page)</p>';
+            echo $sample_link;
+            ?>
+            <p>Clicking this button will load the sample.pub.htm to main div container with class=page</p>
+            <p>It is recommended that all menu/buttons must be made of an html element <?php echo htmlentities('<a></a>');?> similar to the one below </p>
+            <h4>Meaning of the mx- keywords</h4>
+            <table class="data odd_even_row_alternate_color" >
+            <thead><tr><th>Attribute name</th><th>Sample Content</th><th>description</th></tr></thead>
+            <tbody>
+                <tr><td>class</td><td>mx-</td><td>This is needed in all forms of linking to tell maya that there is active link in this element to a view or controller.</td></tr>
+                <tr><td>mx-click</td><td><?php echo htmlentities('?command=display_rest&base_path=&path=sample.pub.htm');?></td>
+                    <td>This means that when clicked then the nearest form or the form specified using mx-form will be posted to this url via ajax.</td>
+                </tr>
+                <tr><td>mx-container</td><td>div.page</td><td>The response of the post will be placed inside the element defined by this container selector</td></tr>                
+            </tbody>
+            </table>
+            <p>* When there are no nearest or specified form, mx-click will use a generic form with just the CSRF values to post</p>
+            <div style="height:20px" ></div>
+            <h4>1.1.2 Load the Full Html Page (header,body,footer) with the Specified View Rendered</h4>
+            <p>A sample 'a' that loads the view file advance.3.pub.htm with entire html page reloaded</p>
+            <?php 
+            $sample_link = '<a class="button" href="?command=display_php&base_path=&path=advance.3.pub.htm" ><li class="fa fa-star"></li> Advance</a>';
+            echo '<p style="font-weight:bold">'.htmlentities($sample_link).'</p>'; 
+            echo '<p>The sample link above will look like the one below: (clicking this will get as back to this exact page)</p>';
+            echo $sample_link;
+            ?>
+            <h4>Meaning:</h4>
+            <table class="data odd_even_row_alternate_color" >
+            <thead><tr><th>Attribute name</th><th>Sample Content</th><th>description</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td>href</td><td><?php echo htmlentities('?command=display_php&base_path=&path=advance.3.htm');?></td>
+                    <?php
+                    $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+                    $host = $protocol . $_SERVER['HTTP_HOST'] ;?>
+                    <td>This means that clicking this button will redirect to <?php echo $host.'/?command=display_php&base_path=&path=advance.3.htm';?></td>
+                </tr>
+            </tbody>
+            </table>
+            <p>* There are no forms submitted when this type of button is clicked</p>
+            <div style="height:20px" ></div>
+            <div style="height:20px" ></div>
+            
+            <h3>1.2 Associating Menu or Button Clicks to a controller </h3>
+			<ul>
+            <li>Maya framework allows to associate clicks to post to controllers using mx- tags.</li> 
+            <li>The controller may return an html view, a json_encoded success-message data or another post command to follow. </li>
+            <li>The util/generateController.php can automatically generate controllers for inserting, updating and deleting items in each table.</li>
+            <li><b>DO NOT EDIT</b> the generated files inside <b>../usr_generate</b> because if you have modifications these will be overwritten by the view you generate using generateView.php utility.</li>
+            <li>You may modify the extended controllers at ../usr/controller folder.</li>
+            <li>Buttons with mx- tags should be placed inside a form with CSRF as shown below or the mx-form tag should be filled to indicate which form to submit during click. </li>
+            <li>If there are no forms nearest or defined using mx-tags, the button will submit a simple form with just CSRF data</li>
+            <li>CRSF can be rendered using any of the model views (eg. user_view->renderCsrf()) located at usr/view/[table]View.php (base model at /usr_generated/view/[table]ViewBase.php</li>
+            <li>Without the CSRF the post will be considered invalid unless you declare the controller as GET method where in you have to protect using your own key or password method</li>
+            </ul>
+			<h4>Sample button below</h4>				
+            <div style="background-color:#DDDDDD">
+<?php
+$code='<form id="link_controller" method="post">
+<?php 
+$uview = new UserView();
+$uview->init_list();
+$uview->renderCsrf();?> 
+<div><a class="button mx-" mx-click="?command=testRest&object=User&id=1" href="#"><li class="fa fa-check"></li> Button</a></div>
+<div><label>Name:</label><input class="mx-required" type="text" name="name" /></div>
+</form>';
+            echo highlight_string($code)[0];?>    
+            </div>        
+			<div style="height:20px"></div>
+            <h4>1.2.1 Associate mx-click to Controllers with JSON response success/message pair</h4>
+            <p>Adding <span style="font-weight:bold">mx-</span>, and <span style="font-weight:bold">mx-click</span> will perform an ajax POST of the form where the button reside. The form must always have an id 
+            attribute. Clicking the button will post the form content of the form where this button is included and the system will either responde with the message or load the resulting html into the contaier. See <a href="#designing_controllers">Designing Controllers</a> for return values of controllers.</p>
+                        <h4>Sample link:</h4>
+            <form id="tes1" method="post">
+            <?php 
+            $uview = new UserView();
+            $uview->init_list();
+            $uview->renderCsrf();
+            $sample_link = '<a class="button mx-" mx-click="?command=testRest&object=User&id=1" mx- href="#"><li class="fa fa-check"></li> Test</a>';
+            echo '<p style="font-weight:bold">'.htmlentities($sample_link).'</p>'; 
+            echo '<p>The sample link above will look like the one below: </p>';
+            echo $sample_link;
+            ?>
+            </form>
+            <p>Clicking the above activate button will return a "Succesfull test of action" because  UsersController->testRestAction() has been designed to return such a message. 
+            The testRestAction() in the controller is the one below:</p>
+            <div style="background-color:#DDDDDD">
+            <?php
+            $code='    public function testRestAction()
+    {
+        $response = array("message"=>"Succesfull test of action","success"=>TRUE);
+        header("Content-Type: application/json");
+        echo json_encode($response);
+        exit();           
+    };';
+            echo highlight_string($code)[0];?>
+            </div>
+            <h4>Meaning.</h4>
+            <table class="data odd_even_row_alternate_color" >
+            <thead><tr><th>Attribute name</th><th>Sample Content</th><th>description</th></tr></thead>
+            <tbody>
+                <tr><td>class</td><td>mx-</td>
+                <td>This is used by Maya to load the javascript that handles association of mx- tags. Withouth this the mx-click and other mx- parameters will not work.</td></tr>
+                <tr>
+                    <td>mx-click</td><td><?php echo htmlentities('?command=testRest&object=User&id=1');?></td>
+                    <td>Controller is from object=User so <span style="color:blue;font-weight:bold">UsersController</span><br>
+                        Controller function is from command=testRest so  <span style="color:blue;font-weight:bold">UsersController->testRestAction()</span><br>
+						The mx-click is the location where the form data will be submitted through ajax. Since we did not specify a form through attr mx-form nor put the button inside a form then it will use the default form with just CSRF data in it.</td>
+                </tr>
+				</tr>
+            </tbody>
+            </table>
+            <p>* Do not place mx-container for controller that return only success or fail with message to prevent the system from saving this loading for reloaded page</p>
+            <div style="height:20px" ></div>
+			<h4>1.2.2 Associating mx-click with Controllers that returns html</h4>
+            <p>Adding <span style="font-weight:bold">mx-</span> class,<span style="font-weight:bold">mx-click</span> attribute and empty <span style="font-weight:bold">mx-container</span> will perform similar to newPost() but you cannot redirect after click. Also this will
+            post the form content of the form where this button is included</p>
+                        <h4>Sample link:</h4>
+            
+            <?php  
+            $sample_link = '<a class="button mx-" mx-container="#system_time"  mx-click="?command=getSystemTimeRest&object=User" href="#"><li class="fa fa-check"></li> Get Time</a>';
+            echo '<p style="font-weight:bold">'.htmlentities($sample_link).'</p>'; 
+            echo '<p>The sample link above will look like the one below: </p>';
+            echo $sample_link;
+            ?>
+            <p>Clicking the above button will return the html generated system time in the div with id=#system_time which is below this line.</p>
+			<h5>The actual div and button bellow</h5>
+            <div>
+                <span>Div id=system_time</span>
+                <div id="system_time" style="display:inline-block;height:80px;background-color:#71c55d;color:white;border-radius:5px;min-width:200px;padding-left:10px;padding-right:10px"></div>
+            </div>
+            <div style="background-color:#DDDDDD">
+            <div><h5>UsersController->getSystemTimeRestAction()</h5></div>
+            <?php
+            $code ='    public function getSystemTimeRestAction()
+    {
+        include __DIR__."/usr/view/widgets/system_time.php";
+        exit();
+    }';
+            echo highlight_string($code)[0];?>
+            <br><br>
+            <div><h5>..usr/view/widgets/system_time.php Widget View</h5></div>
+            <?php
+            $code =file_get_contents(__DIR__."/usr/view/widgets/system_time.php");
+            echo highlight_string($code)[0];?>            
+            </div>
+            
+            <table class="data odd_even_row_alternate_color" >
+            <thead><tr><th>Attribute name</th><th>Sample Content</th><th>description</th></tr></thead>
+            <tbody>
+                <tr><td>class</td><td>mx-</td>
+                <td>This is used by Maya to load the javascript that handles linking of mx- tags.</td></tr>
+                <tr><td>mx-container</td><td>"#system_time"</td><td>When the jquery fetches the content of the page, it loads the page into this element identified by css selector "div.page". If this is blank then the jquery will not load the response to any location but instead it will generate a modal window showing the message returned by the url</td></tr>
+                <tr>
+                    <td>mx-click</td><td><?php echo htmlentities('?command=getSystemTimeRest&object=User');?></td>
+                    <td>Controller is from object=User so <span style="color:blue;font-weight:bold">UsersController</span><br>
+                        Controller function is from command=getSystemTimeRest so  <span style="color:blue;font-weight:bold">UsersController->getSystemTimeRestAction()</span><br>
+						The mx-click is the location where the form data will be submitted through ajax. Since we did not specify a form through attr mx-form nor put the button inside a form then it will use the default form with just CSRF data in it.</td>
+                </tr>
+            </tbody>
+            </table>
+            <p>* This can be used to load the main content of a page or just a portion of the page through ajax</p>
+            <div style="height:20px" ></div> 
+            <h4>1.2.3 Associating mx-click with a confirmation prior to calling a controller</h4>
+            <p>Adding <span style="font-weight:bold">mx-</span> class,<span style="font-weight:bold">mx-click</span> attribute and empty <span style="font-weight:bold">mx-container</span> attribute will perform similar to newPost() but you cannot redirect after click. Also this will
+            post the form content of the form where this button is included</p>
+                        <h4>Sample link:</h4>
+            <?php 
+            $sample_link = '<a class="button mx-" mx-confirm="Are you sure to activate this User with id=1?" mx-click="?command=activate&object=User&id=1" href="#"><li class="fa fa-check"></li> Activate</a>';
+            echo '<p style="font-weight:bold">'.htmlentities($sample_link).'</p>'; 
+            echo '<p>The sample link above will look like the one below: </p>';
+            echo $sample_link;
+            ?>
+            <p>Clicking the above activate button will first ask for confirmation with custom message "Are you sure to activate this User with id=1?". If you press 'Yes' then "Method Unsupported!" message will be returned since the UsersController does not have an activateAction() function. 
+            If you press 'No' then nothing will happen because the action is terminated.</p>
+            <table class="data odd_even_row_alternate_color" >
+            <thead><tr><th>Attribute name</th><th>Sample Content</th><th>description</th></tr></thead>
+            <tbody>
+                <tr><td>class mx-</td><td>mx-</td>
+                <td>This is used by Maya to load the javascript that handles linking of mx- tags.</td></tr>
+                <tr><td>mx-confirm</td><td>"Are you sure to activate this User with id=1?"</td>
+                <td>This will force confirmation with mx-confirm value as message before doing actual action.</td></tr>
+                <tr>
+                    <td>mx-click</td><td><?php echo htmlentities('?command=activate&object=User&id=1');?></td>
+                    <td>The mx-click is the location where the form data will be submitted through ajax.</td>
+                </tr>
+            </tbody>
+            </table>
+            <div style="height:20px" ></div>            
+			<h4>1.2.4 Adding mx-next to mx-click</h4>
+            <h4>Sample link:</h4>
+            <form id="tes1" method="post">
+            <?php 
+            $uview = new UserView();
+            $uview->init_list();
+            $uview->renderCsrf(); 
+            $sample_link = '<a class="button mx-" mx-click="?command=testRest&object=User&id=1" href="#"
+                             mx-next="?command=display_rest&path=home.pub.htm" mx-next_container="div.page" >
+                            <li class="fa fa-check"></li> Test</a>';
+            echo '<p style="font-weight:bold">'.htmlentities($sample_link).'</p>'; 
+            echo '<p>The sample link above will look like the one below: </p>';
+            echo $sample_link;
+            ?>
+            </form>
+            <p>Clicking the above test button will return "Success" message from the UsersController->testRestAction() then it will perform the next action specified by mx-next. The next url will load the home page.</p>
+            <table class="data odd_even_row_alternate_color" >
+            <thead><tr><th>Attribute name</th><th>Sample Content</th><th>description</th></tr></thead>
+            <tbody>
+                <tr><td>class</td><td>mx-</td>
+                <td>This is used by Maya to load the javascript that handles linking of mx- tags.</td></tr>
+                <tr>
+                    <td>mx-click</td><td><?php echo htmlentities('?command=testRest&object=User&id=1');?></td>
+                    <td>The mx-click is the location where the form data will be submitted through ajax.</td>
+                </tr>
+                <tr><td>mx-next</td><td><?php echo htmlentities('?command=display_rest&base_path=&path=home.pub.htm');?></td><td>If the first mx-click action succeeds and this attribute is present, this will be performed as another action mx-next</td></tr>
+                <tr><td>mx-next_container</td><td>"div.page"</td><td>If this is provided and 'mx-next' attribute is present the mx-next will be performed and the result will loaded into the html element defined by mx-next_container selector.</td></tr>
+            </tbody>
+            </table>      
+            <div style="height:20px" ></div>            
+			<h4>1.2.5 Using mx-click to open url to another window</h4>
+            <p>Adding <span style="font-weight:bold">mx-</span>,<span style="font-weight:bold">mx-click</span> and <span style="font-weight:bold">mx-new_window</span> attribute will allow you to open in a new window the mx-click contained in the new_window.
+            post the form content of the form where this button is included</p>
+                        <h4>Sample link:</h4>
+            <?php 
+            $sample_link = '<a class="button mx-" mx-click mx-new_window="?command=display_php&path=contact us.2.pub.htm" href="#">
+                            <li class="fa fa-check"></li> Contact Us</a>';
+            echo '<p style="font-weight:bold">'.htmlentities($sample_link).'</p>'; 
+            echo '<p>The sample link above will look like the one below: </p>';
+            echo $sample_link;
+            ?>
+            </form>
+            <p>Clicking the above test button will open a new window for Contact Us.</p>
+            <table class="data odd_even_row_alternate_color" >
+            <thead><tr><th>Attribute name</th><th>Sample Content</th><th>description</th></tr></thead>
+            <tbody>
+                <tr><td>class</td><td>mx-</td>
+                <tr>
+                    <td>mx-click</td><td></td>
+                    <td>This empty mx-click is just to indicate that click event should be associated with mx-tags.</td>
+                </tr>
+                <tr>
+                    <td>mx-new_window<td><?php echo htmlentities('?command=display_php&path=contact us.2.pub.html');?></td>
+                    <td>The mx-new_window is the url open in another window.</td>
+                </tr>
+            </tbody>
+            </table>       
+            <div id="designing_controllers" style="height:60px"> </div>
+            <h2 >2. Designing Controllers</h2>
+            <p>There are 3 types of controllers, restful controllers that return json encoded array(succes,message), restful controllers that return html views, and non-restful controllers</p>
+            <h3>2.1 Restful Controllers JSON Encoded Response of Success and Message</h3>  
+            <p> This type of controller is best for actions that does not require any view but just a confirmation of success. 
+            For exmample, a delete function of a certain table say users table. When you want to delete a row in the users table, 
+            you send the information needed to identity the object into the controller from a form (example users.id), then all you need to know is whether the delete was successful or not.
+            A typical delete function is shown below:</p>
+            <div style="background-color:#DDDDDD">
+            <?php
+            $code ='
+    public function deleteRestAction() 
+    {
+		$id = $_REQUEST["id"];
+		$user= new User();
+		$user = $user->find(array("id"=>$id));
+        if ($user->getId()>0)
+        {
+            if ($user->delete()==1)            
+            {
+               $message="Successfully deleted ".$id;
+                $success=true;
+            } else
+            {
+                $message="SQL Error! ".$_SESSION["error"];
+                $success=false;
+            }
+        } else
+        {
+            $message="Cannot find user with id=".$id;
+            $success=false;            
+        }
+        $response = array("message"=>$message,"success"=>$success);
+        header("Content-Type: application/json");
+        echo json_encode($response);
+        exit();
+    }';
+            echo highlight_string($code)[0];?>
+            </div>
+            <p>Please note that the deleteRestAction() autogenerated by util/generateController.php is slightly different as involves input validation and structured so that certain sections can easily be overriden by parts.</p>
+            <p>The deleteRestAction() can now be associated with button with class click_action  and attribute url=?command=deleleRest. Please note that the <i>Action</i> is taken out in the command equivalent.</p>
+            <p>Generally the response JSON is already handled by the maya system but in case you want to control on your own the posting and response processing by making your own AJAX code, you immediately parse the return
+            code as data.success which is true or false, and the corresponding messages as data.message.</p>
+            <br>
+            <h3>2.2 Restful Controllers with html payload</h3>  
+            <p> This type of controller is best for actions that return certain html content to the specific container. The html may be dynamically created directly within the controller
+            or a view file that is included within the controller. For example the getSystemTimeRestAction() controller simply includes a view widget shown below:</p>
+            <div style="background-color:#DDDDDD">
+            <div><h5>UsersController->getSystemTimeRestAction()</h5></div>
+            <?php
+            $code ='    public function getSystemTimeRestAction()
+    {
+        include __DIR__."/usr/view/widgets/system_time.php";
+        exit();
+    }';
+            echo highlight_string($code)[0];?>
+            <br><br>
+            <div><h5>..usr/view/widgets/system_time.php Widget View</h5></div>
+            <?php
+            $code =file_get_contents(__DIR__."/usr/view/widgets/system_time.php");
+            echo highlight_string($code)[0];?>            
+            </div>
+            <p>To test the above controller let us link the controller to a button 'Get System Time' and loads in the succeding div container</p>
+            <div style="background-color:#DDDDDD">
+            <div><h5>Container is div below with id=system_time</h5></div>
+            <?php
+            $code ='<div id="system_time" style="display:inline-block;height:80px;background-color:#71c55d;color:white;border-radius:5px"></div>';
+            echo highlight_string($code)[0];?>
+            <br><br>
+            <div><h5>Button is</h5></div>
+            <?php
+            $code ='<button class="mx-" mx-container="#system_time" mx-click="?command=getSystemTimeRest&object=User">Get System Time</button>';
+            echo highlight_string($code)[0];?>
+            <div>
+            <br><br>
+            <div><h5>Form containing the button shold have csrf as show below:</h5></div>
+            <?php
+            $code='         <form id="test_system_time" method="post">
+            <?php 
+            $uview = new UserView();
+            $uview->init_list();
+            $uview->renderCsrf();?>
+            <button type="button" class="mx-" mx-container="#system_time" mx-click="?command=getSystemTimeRest&object=User">Get System Time</button>
+            </form>';
+            echo highlight_string($code)[0];?>
+            </div> 
+            </div>
+            <h5>The actual div and button bellow</h5>
+            <div>
+                <span>Div id=system_time</span>
+                <div id="system_time" style="display:inline-block;height:80px;background-color:#71c55d;color:white;border-radius:5px;min-width:200px;padding-left:10px;padding-right:10px"></div>
+            </div>
+            <div>
+                <span>Button</span>
+                <form id="test_system_time" method="post" style="display:inline-block">
+                <?php 
+                $uview = new UserView();
+                $uview->init_list();
+                $uview->renderCsrf();?>
+                <button type="button" class="mx-" mx-container="#system_time" mx-click="?command=getSystemTimeRest&object=User" >Get System Time</button>
+                </form>
+            </div>
+            <p>Clicking on the 'Get System Time' button loads the current system time in Y-m-d H:i:s format on the specified div with id="system_time". Clicking it again will update the system time.</p>
+            <br><br>
+            <h3>2.3 Non-restful Controllers that reloads entire page again</h3>
+            <p> This method is not desired because this takes a lot of time reloading the entire page, but there are cases where this may apply as you need to refresh the entire page for example when you perform login.
+            As an example we will just try a non-restful controller that displays only a notice message. This controllers cannot be associated directly to a button using click_action but instead using the form's action;
+            Maya has global sesssion variable $_SESSION['maya_notice'] that gets displayed when you load the page. So filling this with value will show right after the page loads for about 3 seconds.
+            <div style="background-color:#DDDDDD">
+            <div><h5>The controller we have for echoSubmitAction():</h5></div>
+            <?php
+            $code =' public function submitEchoAction()
+    {
+        $input=$_REQUEST["echo_test"];
+        $_SESSION["maya_notice"]="The input is $input\r\n";
+    } ';
+            echo highlight_string($code)[0];?>
+            <br><br>
+            <div><h5>The form to submit to echoSubmitAction():</h5></div>
+            <?php
+            $code =' <form method="POST" action="?command=submitEcho&object=User">
+            <input type="text" value="echo" name="echo_test"/>
+            <?php 
+                $uview = new UserView();
+                $uview->init_list();
+                $uview->renderCsrf();?>
+            </p>
+            <button>Submit</button>
+            </form>  ';
+            echo highlight_string($code)[0];?>
+            <br><br>
+            </div>
+            <form method="POST" action="?command=submitEcho&object=User">
+            <input type="text" value="echo" name="echo_test"/>
+            <?php 
+                $uview = new UserView();
+                $uview->init_list();
+                $uview->renderCsrf();?>
+            </p>
+            <button>Submit</button>
+            </form>  
+            <p>Typing a text above and clicking submit will send the text typed to the UsersController->submitEchoAction().
+            The submitEchoAction() will put the input into a global $_SESSION['maya_notice'] for display. The page
+            will reload but since there are no specified item to display you will be going back to the homepage.</p>
+ 
+             <h3>2.3 External Link Controllers</h3>
+            <p> These are controllers that can be accessed directly through a link. Typical purpose of these controllers are email links for confirmation, chat links, or video links within the system. 
+            <b>Warning!</b> These links are very insecure so you must put some form of security such as a secure key that varies per transaction, or secure keys that exist only for a certain period of time.
+            These controllers should always end in <b>ActionGet()</b> such as confirmActionGet(), so that for example this is on Users controller then the link created should be <b>?command=confirm&object=User&key=secret_key</b>
+            <div style="background-color:#DDDDDD">
+            <div><h5>The controller we have for confirmActionGet():</h5></div>
+            <?php
+            $code =' public function confirmActionGet()
+    {
+        $key=$_REQUEST["key"];
+        if ($key=="secret_key")
+        {
+            echo "<p>You have confirmed successfully!</p>";
+        }
+    } ';
+            echo highlight_string($code)[0];?>
+            <br><br>
+            <div><h5>The link to activate this controller is shown below</h5></div>
+            <?php
+            $code ='< target=_blank ';
+            echo highlight_string($code)[0];?>
+            <br><br>
+            </div>
+            <form method="POST" action="?command=submitEcho&object=User">
+            <input type="text" value="echo" name="echo_test"/>
+            <?php 
+                $uview = new UserView();
+                $uview->init_list();
+                $uview->renderCsrf();?>
+            </p>
+            <button>Submit</button>
+            </form>  
+            <p>Typing a text above and clicking submit will send the text typed to the UsersController->submitEchoAction().
+            The submitEchoAction() will put the input into a global $_SESSION['maya_notice'] for display. The page
+            will reload but since there are no specified item to display you will be going back to the homepage.</p>
+            
+            <div id="view_structures" style="height:60px"> </div>
+            <h2 >3. Structures of Generated Views</h2>
+            <br>
+            <h3>3.1 View Object</h3>
+            <p>A sample view object is shown below</p>
+            <div style="background-color:#DDDDDD">
+            <?php
+            $code =file_get_contents(__DIR__.'/lib/SampleViewBase.php');
+            echo highlight_string(str_replace("\r",'',$code))[0];?>
+            </div>
+            <br><br>
+            <h3>3.2 List View list_samples.maya.php</h3>
+            <p>A sample view object is shown below</p>
+            <div style="background-color:#DDDDDD">
+            <?php
+            $code =file_get_contents(__DIR__.'/lib/list_samples.maya.php');
+            echo highlight_string(str_replace("\r",'',$code))[0];?>
+            </div>
+            <br><br>
+        </div>
+    </div>    
+    <br><br><br>

@@ -1,0 +1,36 @@
+<?php 
+if (method_exists($[TABLE_ELEMENT]_view,'renderUploadImage'))
+{
+    $[TABLE_ELEMENT]_view->renderUploadImage();
+} else
+{
+if (!isset($src)) $src=$this->paths->base_url.'/img/displaypng.php?id='.$[VIEW_OBJECT]->current_user->getId().'&image='.$[VIEW_OBJECT]->[TABLE_ELEMENT]->getImage().'&key='.urlencode($[VIEW_OBJECT]->current_user->getSecurekey());    
+if (!isset($src_icon)) $src_icon='img/displaypng.php?id='.$[VIEW_OBJECT]->current_user->getId().'&image='.$[VIEW_OBJECT]->[TABLE_ELEMENT]->getImageIcon().'&key='.urlencode($[VIEW_OBJECT]->current_user->getSecurekey());    
+if (!isset($redirect_after_image_upload)) $redirect_after_image_upload = "?command=display_php&base_path=".$_REQUEST["base_path"]."&path=".$_REQUEST["path"]."&id=".$[VIEW_OBJECT]->[TABLE_ELEMENT]->getId();
+    ?>
+<form id="upload_[CLASS_NAME]" action='<?php echo $this->paths->base_url;?>/?command=uploadImage&object=[CLASS_NAME]&path=<?php echo $path; ?>' class='form round-corners' method='post' style='float:center; display:block' enctype='multipart/form-data' > 
+<div>
+	<div style="display:inline-block" >
+	<img class="profile"  src='<?php echo $src;?>' />
+	<label style="display:block">Profile</label>
+	</div>
+    <?php if (!(isset($disable_profile_icon) && $disable_profile_icon))
+    {?>
+	<div style="display:inline-block">
+	<img class='profile_icon'  src='<?php echo $src_icon;?>' />
+	<label style="display:block">Icon</label>
+	</div>
+	<?php 
+    }
+    echo $[VIEW_OBJECT]->renderCsrf();?>
+</div>
+<div>
+<input type="file" name="file" id="file" class="button fa fa-plus" accept="image/*" />
+<input type='hidden' name='id' value='<?php echo $[VIEW_OBJECT]->[TABLE_ELEMENT]->getId();?>' />
+<input type='hidden' name='redirect' value='<?php echo $redirect_after_image_upload; ?>' />
+<textarea id="upload_content" type="submit" style="display:none" name="upload_content" value=""></textarea>
+<button type="submit" class="button" name="submit"><i class="fa fa-upload"></i>Upload</button>
+</div>
+</form>
+<?php
+}?>

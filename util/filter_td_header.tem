@@ -1,0 +1,30 @@
+    public function render_[FILTER_FIELD]_filter()
+    {
+		echo "<select  class='filter' name='[TABLE_NAME]_select_filters[[FILTER_FIELD]]' value='' > \r\n";
+		echo "<option value=''>All</option> \r\n";
+	
+		if (in_array('0',$this->distinct_[FILTER_FIELD]_lst)) 
+		{
+			if (array_key_exists('[FILTER_FIELD]',$this->select_filters) && ($this->select_filters['[FILTER_FIELD]']=='0'))
+			{
+				echo "<option selected='selected' value='0' >Unassigned</option>";
+			} else
+			{
+				echo "<option value='0' >Unassigned</option>";
+			}
+		}
+		$[FOREIGN_FIELD_NAME]_handle = new [FOREIGN_FIELD_FUNCTION_NAME]();
+		$[FOREIGN_FIELD_NAME]s = $[FOREIGN_FIELD_NAME]_handle->findAll(array('id'=>$this->distinct_[FILTER_FIELD]_lst),array('[FILTER_SORT_FIELD]'=>'ASC'));
+		foreach ($[FOREIGN_FIELD_NAME]s as $[FOREIGN_FIELD_NAME])
+		{
+			if (($this->select_filters['[FILTER_FIELD]']) && ($this->select_filters['[FILTER_FIELD]']==$[FOREIGN_FIELD_NAME]->getId()))
+			{
+				echo "<option selected='selected' value='".$[FOREIGN_FIELD_NAME]->getId()."' >".$[FOREIGN_FIELD_NAME]->getName()."</option>";
+			} else
+			{
+				echo "<option value='".$[FOREIGN_FIELD_NAME]->getId()."' >".$[FOREIGN_FIELD_NAME]->getName()."</option>";
+			}
+		}
+		echo "</select> \r\n";		
+	}
+	

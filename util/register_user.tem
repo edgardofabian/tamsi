@@ -1,0 +1,111 @@
+<?php 
+if (!defined("PROJECT")) die("Unauthorized!");
+require_once 'Role.php'; 
+if (!isset($user_view)) 
+{ 
+	require_once 'UserView.php'; 
+	$user_view = new UserView(); 
+	$user_view->init_new();
+}?> 
+<form id="register_user"  <?php echo $user_view->new_form_attributes;?> class="new" action="?command=new&object=User&base_path=<?php echo $_REQUEST["base_path"];?>&path=<?php echo $path;?>" method="POST">
+<?php $user_view->renderLoggedOutCsrf();?> 
+<?php $user_view->renderCustomNew();?> 
+<table class='odd_even_row_alternate_color full_width data' >
+<thead><th>Field</th><th>Data</th></thead>
+<tbody>
+<tr id='tr_firstname'><td class='label'>Firstname </td><td id='td_firstname'>
+<?php
+    if (!isset($firstname_attributes)) 
+    { 
+        $firstname_attributes=array("placeholder"=>"Firstname ");
+    } 
+    $user_view->renderFirstname($user_view->user,isset($edit_firstname),isset($readonly_firstname),isset($hidden_firstname),$firstname_attributes);
+?>
+</td></tr>
+<tr id='tr_lastname'><td class='label'>Lastname </td><td id='td_lastname'>
+<?php
+    if (!isset($lastname_attributes)) 
+    { 
+        $lastname_attributes=array("placeholder"=>"Lastname ");
+    } 
+    $user_view->renderLastname($user_view->user,isset($edit_lastname),isset($readonly_lastname),isset($hidden_lastname),$lastname_attributes);
+?>
+</td></tr>
+<tr id='tr_email'><td class='label'>Email </td><td id='td_email'>
+<?php
+    if (!isset($email_attributes)) 
+    { 
+        $email_attributes=array("placeholder"=>"Email ");
+    } 
+    $user_view->renderEmail($user_view->user,isset($edit_email),isset($readonly_email),isset($hidden_email),$email_attributes);
+?>
+</td></tr>
+<tr><td class='label' colspan='2'>Change Password</td></tr>
+<tr><td class='label'>password</td><td><input id='profile_password' class='' type='password' name='password' value='' style='max-width:200px' ></input><button id='show_profile_password' type='button' class=' button' href='#' style='color:gray;background-color:white'> <i class='fa fa-eye'></i></button></td></tr>
+<tr><td class='label'>confirm password</td><td><input id='profile_password_confirm' type='password' class='' name='confirm_password' value='' style='max-width:200px' ></input><span id='password_match' class=' fa fa-times' name='match' style='margin-left:10px;width:30px'></span></td></tr>
+[REGISTER_DEFAULTS]
+<script>
+$( function()
+{
+	$("#show_profile_password").click( function()
+	{
+		showProfilePassword("profile_password");
+	});
+	
+	$("#profile_password").keyup( function()
+	{
+		if ($("#profile_password").val()==$("#profile_password_confirm").val()) 
+		{
+			$("#password_match").removeClass("fa-times");
+			$("#password_match").addClass("fa-check");
+			$("#password_match").css("background-color:green");
+			
+		} else
+		{
+			$("#password_match").removeClass("fa-check");
+			$("#password_match").addClass("fa-times");
+			$("#password_match").css("background-color:red");
+		}
+		
+	});
+	
+	$("#profile_password_confirm").keyup( function()
+	{
+		if ($("#profile_password").val()==$("#profile_password_confirm").val()) 
+		{
+			$("#password_match").removeClass("fa-times");
+			$("#password_match").addClass("fa-check");
+			$("#password_match").css("background-color:green");
+			
+		} else
+		{
+			$("#password_match").removeClass("fa-check");
+			$("#password_match").addClass("fa-times");
+			$("#password_match").css("background-color:red");
+		}
+	});
+	
+});
+function showProfilePassword(id) 
+{
+	var pw = document.getElementById(id);
+	var pwc = document.getElementById(id+"_confirm");
+	if (pw.type === "password") 
+	{
+		pw.type = "text";
+		pwc.type = "text";
+		setTimeout(function() { showProfilePassword(id); },1500);
+	} else 
+	{
+		pw.type = "password";
+		pwc.type = "password";
+	}
+}
+</script>
+</tbody>
+</table><div class="custom_widget">
+<?php if ($user_custom_widget) include "$user_custom_widget"; ?>
+</div>
+<button type="button" class="button mx-" mx-click="?command=newRest&object=User" href="#" mx-next="?command=display_rest&path=Admin.dir/Users.dir/List Users.rest.php" mx-container="div.page"><li class="fa fa-plus"></li> Register </button>
+</form>
+</div>

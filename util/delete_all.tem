@@ -1,0 +1,23 @@
+    public  function deleteAll()
+    {
+        $mysqli = new mysqli($this->db->host,$this->db->user, $this->db->password, $this->db->name);
+        if ($mysqli->connect_errno) 
+        {
+            $_SESSION['tamsi_notice'].="Connect failed: ".$mysqli->connect_error." \r\n";
+            return false;
+        } 
+        
+        $sql="DELETE FROM [TABLE] WHERE id>'0'";
+        $mysqli->query($sql);
+        
+        $sql="ALTER TABLE [TABLE] AUTO_INCREMENT = 1;";
+        $mysqli->query($sql);
+        
+        if ($mysqli->error)
+        {
+            $_SESSION['tamsi_notice'].="Errormessage: ".$mysqli->error."  \r\n";
+            return false;
+        } 
+        $mysqli->close();
+        return true;
+    } 

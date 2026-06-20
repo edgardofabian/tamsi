@@ -1,0 +1,282 @@
+    protected $requirements;
+    
+    protected function setRequirements($reqs)
+    {
+        $this->requirements = $reqs;
+    }
+    
+    protected function validate()
+    {
+        $success=TRUE;
+        $message='';
+        if (isset($this->requirements))
+        {
+        
+            foreach($this->requirements as $field=>$req)
+            {
+                if (in_array('required',$req))
+                {
+                    if (!((array_key_exists($field,$_REQUEST)) && trim($_REQUEST[$field]))) 
+                    {
+                        $success = FALSE;
+                        $message.= "Missing required $field.\r\n";
+                    }
+                }
+                if (in_array($field,$_POST))
+                {
+                    if (in_array('email',$req))
+                    {
+                        if (!filter_var(trim($_POST[$field]), FILTER_VALIDATE_EMAIL))
+                        {
+                            $success = FALSE;
+                            $message.= 'Your $field:'.$_POST[$field]." appears to be invalid email.\r\n";
+                        }
+                    }
+                    if (in_array('numeric',$req))
+                    {
+                        if (!is_numeric(trim($_POST[$field])))
+                        {
+                            $success = FALSE;
+                            $message.= "$field is not numeric .\r\n";
+                        }
+                    }            
+                }
+            }
+        }
+        
+        $response = array('message'=>$message,'success'=>$success);
+        
+        return $response;
+    }
+    
+    protected function getPost($[TABLE_ELEMENT])
+    {
+        [POST_ENTITY];
+        return $[TABLE_ELEMENT];
+    }
+        
+    protected function getPostNew($[TABLE_ELEMENT])
+    {
+        return $this->getPost($[TABLE_ELEMENT]);
+    }
+        
+    public function create()
+    {
+        $response = $this->validate();
+        if ($response['success'])
+        {
+            $[TABLE_ELEMENT]= new [CLASS_NAME]();
+            $[TABLE_ELEMENT] = $this->getPostNew($[TABLE_ELEMENT]);
+            $response = $this->save_new_user($[TABLE_ELEMENT]);
+        }
+        if (array_key_exists('id',$response))
+        {
+            $next = new Next();
+            $next->url = '?command=display_rest&path=[ADMIN_DIR]/[CONTROLLER_NAME].dir/Edit [CLASS_NAME].hid.rest.php&id='.$response['id'];
+            $next->container = '[CONTAINER]';
+            $response['next']=$next;
+        }
+        return $response;
+    }
+    
+    protected function save_new_user($user)
+    {
+        $old_user = new User();
+        $old_user = $old_user->find(array('email'=>$user->getEmail()));
+        $confirm_password=$_POST['confirm_password'];
+        if ($old_user->getId()>0)
+        {
+            $message='User with the same email='.$user->getEmail().'  already exist!';
+            $success =false;
+        } else 
+        if (strcmp($_POST["password"],$confirm_password)===0)
+        {
+            if (strlen($confirm_password)<50)
+            {
+                $secure = new Secure_config();
+                $user->setSalt($this->security->generateSalt(10));
+                $user->setPassword($this->security->generateHash($confirm_password,$user->getSalt(),$secure->secret_key));
+                $user->setIp($_SERVER['REMOTE_ADDR']);
+                $message.= "Profile and password updated! \r\n";
+                if ($[TABLE_ELEMENT]->save()>0)
+                {
+
+                   $message='Successfully created '.$[TABLE_ELEMENT]->getName().'.';
+                   $success=true;
+                   
+                } else
+                {
+                   $message='SQL Error! '.$_SESSION['error'].' '.$_SESSION['tamsi_notice'];
+                   $success=false;
+                }
+            } else
+            {
+                $message.='Password too long! '.$_SESSION['error'];
+                $success=false;
+            }
+        } else
+        {
+            $message='Password did not match!';
+            $success =false;
+        }        
+        $response = array('message'=>$message,'success'=>$success,'id'=>$[TABLE_ELEMENT]->getId());
+        return $response;
+    }
+    
+    protected function getUser()
+    {
+        $id = $_REQUEST['id'];
+		$user= new User();
+		$user = $user->find(array('id'=>$id));
+        return $user;
+    }
+
+    protected function setDefaultIdRequirements()
+    {
+        if (!isset($this->requirements))
+        {
+            $this->requirements=array('id'=>array('required'));
+        }
+        if (!array_key_exists('id',$this->requirements))
+        {
+            $this->requirements = array_merge($this->requiremenst, array('id'=>array('required')));
+        }
+    }
+
+    protected function setEditRequirements()
+    {
+        $this->setDefaultIdRequirements();
+        $edit_user_requirements = array('firstname'=>array('required'),'lastname'=>array('required'),'email'=>array('required','email'));
+        $this->requirements = array_merge($this->requirements, $edit_user_requirements);
+    }
+    
+    protected function setNewRequirements()
+    {
+        $this->requirements = array('firstname'=>array('required'),'lastname'=>array('required'),'password'=>array('required'),'email'=>array('required','email'));
+    }  
+    
+    protected function edit()
+    {
+        $response = $this->validate();
+        if ($response['success']) 
+        {
+            $[TABLE_ELEMENT] = $this->get[CLASS_NAME]();
+            if (is_object($[TABLE_ELEMENT]) && ($[TABLE_ELEMENT]->getId()))
+            {
+                $[TABLE_ELEMENT]=$this->getPost($[TABLE_ELEMENT]);
+                $response = $this->update_user($[TABLE_ELEMENT]);
+            }
+            else
+            {
+                $message='Cannot find $[TABLE_ELEMENT]! '.$_SESSION['tamsi_notice'];
+                $success=false;
+                $response = array('message'=>$message,'success'=>$success);
+            }
+        }
+        return $response;
+    }
+    
+    protected function update_user($user)
+    {
+        $user->setIp($_SERVER['REMOTE_ADDR']);
+        
+        $secure = new Secure_config();
+        $confirm_password = $_POST["confirm_password"];
+        $message = '';
+        $success = true;
+        if ((strlen($confirm_password)>0) || (strlen($_POST["password"])>0))
+        {
+            if (strcmp($_POST["password"],$confirm_password)===0)
+            {
+                if (strlen($confirm_password)<50)
+                {
+                    $user->setSalt($this->security->generateSalt(10));
+                    $user->setPassword($this->security->generateHash($confirm_password,$user->getSalt(),$secure->secret_key));
+                    $user->setIp($_SERVER['REMOTE_ADDR']);
+                    $message.= "Profile and password updated! \r\n";
+                } else
+                {
+                    $message.='Password too long! '.$_SESSION['error'];
+                    $success=false;
+                }
+            } else
+            {
+                $message.='Password Error! '.$_SESSION['error'];
+                $success=false;
+            }
+        } else
+        {
+            $message.="Profile updated!, password preserved. \r\n";
+        }
+            
+
+        if ($success)
+        {
+            if ($user->save()>0)
+            {
+               $message.='Successfully saved '.$[TABLE_ELEMENT]->getName();
+               $success=true;
+            } else
+            {
+               $message.='SQL Error! '.$_SESSION['error'].' '.$_SESSION['tamsi_notice'];
+               $success=false;
+            }
+        }
+        $response = array('message'=>$message,'success'=>$success);
+        return $response;         
+    }
+    
+    protected function remove($[TABLE_ELEMENT])
+    {
+        if ($[TABLE_ELEMENT]->getId()>0)
+        {
+            if ($[TABLE_ELEMENT]->delete()==1)
+            {
+                
+                $message='Successfully deleted '.$id;
+                $success=true;
+            } else
+            {
+                $message='SQL Error! '.$_SESSION['tamsi_notice'];
+                $success=false;
+            }
+        } else
+        {
+            $message='Cannot find [TABLE_ELEMENT] with id='.$id;
+            $success=false;            
+        }
+        $response = array('message'=>$message,'success'=>$success);
+        return $response;
+    }    
+
+    public function delete()     
+    {
+        $response = $this->validate();
+        if ($response['success']) 
+        {
+            $[TABLE_ELEMENT] = $this->get[CLASS_NAME]();
+            $response=$this->remove($[TABLE_ELEMENT]);
+        }
+        return $response;
+    }   
+    
+    public function newRestAction()
+    {
+        $this->setNewRequirements();
+        $response = $this->create();
+        $this->json_response($response);
+    }    
+    
+    public function editRestAction()     
+    {
+        $this->setEditRequirements();
+        $response = $this->edit();
+        $this->json_response($response);
+    }    
+
+    public function deleteRestAction()     
+    {
+        $this->setDefaultIdRequirements();
+        $response=$this->delete();
+        $this->json_response($response);        
+    }

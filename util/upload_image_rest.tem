@@ -1,0 +1,43 @@
+    public function uploadImageRestAction()
+    {
+        
+		$[TABLE_ELEMENT] = $this->get[CLASS_NAME]();;
+        $this->uploadImageRest($[TABLE_ELEMENT]);
+    }
+    
+    protected function uploadImageRest($[TABLE_ELEMENT])
+    {
+        $name = str_replace(',','_',str_replace(' ','',$[TABLE_ELEMENT]->getName()));
+        $name = str_replace(':','_',$name);
+        $paths = new Paths();
+        $ext = strtolower(strrchr($_FILES["file"]["name"], '.'));
+        $image = new TamsiImage();
+        $filename=$id.'_'.strtolower($name);
+        $image->setFilename($filename.$ext);
+        $image->setPath($paths->user_image."[TABLE]/");
+        
+        if ($image->save())
+        {
+            $this->createIcon($image,$name);
+            $message = 'Successfully uploaded image';
+            $success = true;
+        } else
+        {
+            $message = 'Cannot save image!';
+            $success = false;
+        }
+        
+        $response = array('message'=>$message,'success'=>$success);
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit();        
+    }
+    
+    protected function createIcon($image,$name)
+    {
+        $image->setWidth('180');
+        $image->setHeight('180');
+        $image->setExt('.png');
+        $image->resize("force_width");
+        $image->createIcon('64','64',$id.'_'.strtolower($name).'_icon.png');
+    }

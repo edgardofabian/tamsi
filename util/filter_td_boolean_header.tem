@@ -1,0 +1,26 @@
+    public function render_[FILTER_FIELD]_filter()
+    {
+		echo "<select  class='filter' name='[TABLE_NAME]_select_filters[[FILTER_FIELD]]' value='' > \r\n";
+        echo "<option value=''>None</option> \r\n";
+        
+        $true_label='active';
+        if (array_key_exists('[FILTER_FIELD]',$this->columns) && array_key_exists('true_label',$this->columns['[FILTER_FIELD]'])) $true_label = $this->columns['[FILTER_FIELD]']['true_label'];
+        $false_label='inactive';
+        if (array_key_exists('[FILTER_FIELD]',$this->columns) && array_key_exists('false_label',$this->columns['[FILTER_FIELD]'])) $false_label = $this->columns['[FILTER_FIELD]']['false_label'];
+        
+		$options = array(0=>$false_label,1=>$true_label);
+        foreach($options as $val=>$label)
+		{
+			
+			if ((array_key_exists('[FILTER_FIELD]',$this->select_filters)) && ($this->select_filters['[FILTER_FIELD]']==$val))
+			{
+				echo "<option selected='selected' value='".$val."' >".$label."</option>";
+			} 
+			else
+			{
+				echo "<option value='".$val."' >".$label."</option>";
+			}
+		}
+		echo "</select> \r\n";		
+	}
+	

@@ -1,0 +1,63 @@
+    public function getImage($folder='')
+    {
+        $paths = new Paths();
+        $name = $this->generateImageName($folder);
+        if (file_exists($paths->user_image.'[TABLE]/'.strtolower($name).'.svg'))
+        {
+            $absolute_path = $paths->user_image.'[TABLE]/'.strtolower($name).'.svg';
+        }
+        else
+        {
+            $absolute_path = $paths->user_image.'[TABLE]/'.strtolower($name).'.png';
+        }
+        if (file_exists($absolute_path))
+        {
+            return $absolute_path;
+        } else
+        {
+            return $paths->user_image.'[TABLE]/'."none.png";
+        }
+    }
+    public function getImageUrl($folder='')
+    {
+        $paths = new Paths();
+        $name = $this->generateImageName($folder);
+        if (file_exists($paths->user_image.'[TABLE]/'.strtolower($name).'.svg'))
+        {
+            $absolute_path = $paths->user_image.'[TABLE]/'.strtolower($name).'.svg';
+        }
+        else
+        {
+            $absolute_path = $paths->user_image.'[TABLE]/'.strtolower($name).'.png';
+        }
+        $url = str_replace($paths->public,'',$absolute_path);
+        return $url;
+    }    
+    public function getImageIcon($folder='')
+    {
+        $paths = new Paths();
+        $name = $this->generateImageName($folder);
+        $absolute_path = $paths->user_image.'[TABLE]/'.strtolower($name).'_icon.png';
+        if (file_exists($absolute_path))
+        {
+            return $absolute_path;
+        } else
+        {
+            return $paths->user_image.'[TABLE]/'."none_icon.png";
+        }
+    }
+    public function getImageIconUrl($folder='')
+    {
+        $paths = new Paths();
+        $name = $this->generateImageName($folder);
+        $absolute_path = $paths->user_image.'[TABLE]/'.strtolower($name).'_icon.png';
+        $url = str_replace($paths->public,'',$absolute_path);
+        return $url;
+    }    
+    
+    public function generateImageName($folder)
+    {
+        $name = str_replace(',','_',str_replace(' ','',strip_tags($this->getId().'_[TABLE]')));
+        $name=strtolower($name).($folder?'_'.$folder:'');    
+        return $name;
+    }    

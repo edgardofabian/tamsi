@@ -1,0 +1,42 @@
+    public $src_[DATA];
+    public $src_[DATA]_icon;
+    public function renderUpload[DATA_FUNCTION_NAME]($[TABLE_ELEMENT],$disable_[DATA]_icon=FALSE,$redirect_after_image_upload='',$img_attributes='',$edit_enabled=TRUE)
+    {
+        if (!isset($this->src_[DATA])) $this->src_[DATA]=$this->paths->base_url.'/img/displaypng.php?id='.$this->current_user->getId().'&image='.$this->[TABLE_ELEMENT]->getImage('[DATA]').'&key='.urlencode($this->current_user->getSecurekey()).'&rnd='.rand(1,100);    
+        if (!isset($this->src_[DATA]_icon)) $this->src_[DATA]_icon='img/displaypng.php?id='.$this->current_user->getId().'&image='.$this->[TABLE_ELEMENT]->getImageIcon('[DATA]').'&key='.urlencode($this->current_user->getSecurekey()).'&rnd='.rand(1,100);    
+        if ($edit_enabled)
+        {
+            echo '<form id="upload_[DATA]" action="<?php echo $this->paths->base_url;?>/?command=upload[DATA_FUNCTION_NAME]&object=[CLASS_NAME]&id='.$[TABLE_ELEMENT]->getId().'" class="form image round-corners" method="post" style="float:center; display:block" enctype="multipart/form-data" >';
+        }
+        echo '<div>
+                <div class="profile_container" >
+                    <img class="profile"  src="'.$this->src_[DATA].'" '.$img_attributes.'/>
+                </div>';
+                if (!(isset($disable_[DATA]_icon) && $disable_[DATA]_icon))
+                {
+                    echo '<div style="display:inline-block">';
+                    echo '<img class="profile_icon"  src="'.$this->src_[DATA]_icon.'" />';
+                    echo '<label style="display:block">Icon</label>';
+                    echo '</div>';
+                }
+        if ($edit_enabled)
+        {
+                $this->renderCsrf();
+            echo '<input type="file" name="file" id="file" class="button fa fa-plus" accept="image/*" />';
+            echo '<input type="hidden" name="id" value="'.$this->[TABLE_ELEMENT]->getId().'" />';
+            echo '<input type="hidden" name="redirect" value="'.$redirect_after_image_upload.'" />';
+            echo '<textarea id="upload_content" type="submit" style="display:none" name="upload_content" value=""></textarea>';
+            echo '<button type="submit" class="button" name="submit"><i class="fa fa-upload"></i>Upload</button>';
+        }
+        
+            echo '</div>';
+        if ($edit_enabled)
+        {
+            echo '</form>';
+        }
+    }
+
+    public function render[DATA_FUNCTION_NAME]($[TABLE_ELEMENT])
+    {
+        echo '<span>'.$[TABLE_ELEMENT]->get[DATA_FUNCTION_NAME]().". (See upload button above this table)</span>\n";
+    }

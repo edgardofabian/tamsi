@@ -1,0 +1,38 @@
+    public function render_[DATA]()
+    {
+        $class='';
+        $attrs='';
+        $[TABLE_ELEMENT]_field='[DATA]';
+        foreach($this->columns[$[TABLE_ELEMENT]_field]['attributes'] as $name=>$value)
+        {
+            if ($name=='class')
+            {
+               $class.=' '.$value;
+            }
+            else
+            {
+               $attrs.=$name.'="'.$value.'" ';
+            }
+            
+        }
+
+        $value=($this->[TABLE_ELEMENT]->get[DATA_FUNCTION_NAME]())?htmlentities($this->[TABLE_ELEMENT]->get[DATA_FUNCTION_NAME]()):'';
+        if (($this->columns[$[TABLE_ELEMENT]_field]['type']=='hidden') || ($this->columns[$[TABLE_ELEMENT]_field]['type']=='readonly'))
+        {
+            echo "<input $attrs type='hidden' name='[DATA]'  value='$value' />";
+            if ($this->columns[$[TABLE_ELEMENT]_field]['type']=='readonly')
+            {
+                echo "<span>$value</span>";
+            }
+        } else
+        {
+            if ($this->columns[$[TABLE_ELEMENT]_field]['mode']=='edit')
+            {
+                echo "<span class='view_input'>".$value."</span>";
+                echo "<textarea id='edit_[DATA]' $attrs class='$class [CUSTOM_CLASS] edit_input' name='[DATA]' >".$value."</textarea>";                
+            } else
+            {
+                echo "<textarea id='edit_[DATA]' $attrs type='text' class='$class [CUSTOM_CLASS]' name='[DATA]' >".$value."</textarea>";
+            }
+        }
+    }

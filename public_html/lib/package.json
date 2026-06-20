@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@dimakorotkov/tinymce-mathjax": "^1.0.11"
+  }
+}

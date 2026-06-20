@@ -1,0 +1,25 @@
+<?php 
+if (isset($_SERVER['HTTP_REFERER']))
+{
+    $back=$_SERVER['HTTP_REFERER'];
+    $_SESSION['back']=$back;
+} else
+{
+    $back=$_SESSION['back'];
+}
+if (strpos($back,'?command=display_rest'))
+{
+    $command = explode('?command',$back)[1];
+    echo '<button type="button" class="button mx-" href="#" mx-container="'.$[VIEW_OBJECT]->container.'" mx-click="?command'.$command.'" ><i class="fa fa-arrow-left"></i>back</button>';
+} else
+{
+    if (strpos($back,'?command=logout'))
+    {
+        echo '<a class="button" href="?command=home&clearcache=true" ><i class="fa fa-arrow-left"></i>back</a>';
+        $_SESSION['back']='?command=home&clearcache=true';
+    } else
+    {
+        echo '<a class="button" href="'.$_SERVER['HTTP_REFERER'].'" ><i class="fa fa-arrow-left"></i>back</button>';
+    }
+}
+?>

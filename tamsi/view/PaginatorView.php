@@ -1,0 +1,132 @@
+<?php
+$paths = new Paths();
+?>
+<script>
+    <?php
+    if (!isset($this->container)) $this->container = 'div.page';
+    if (!isset($this->form_list)) $this->form_list = 'form_list_tasks';
+    ?>
+    function paginate(page) 
+    {
+        var form = $("#<?php echo $this->form_list;?>");
+        
+        var target = "<?php echo $this->container;?>";
+        
+        var url_submit = form.attr('action');        
+        var url = url_submit;
+        if (url_submit.indexOf('command=display_php')>=0)
+        {
+            url = url_submit.replace('command=display_php','command=display_rest');
+        } 
+        
+        if (url.indexOf('<?php echo $paths->base_url;?>')<0)
+        {
+            url = '<?php echo $paths->base_url;?>/'+url;
+        }
+        
+        form.find('input.field_page').val(page);
+        form.find('input.field_items_per_page').val($('#items_per_page').val());
+        if (typeof loadToSelector == 'function') 
+        { 
+            loadToSelector(url,target,form,'',loader_img)
+        } else
+        {
+            form.attr('action',url_submit);
+            form.submit();
+        }
+        
+    }
+</script>
+<div class="paginator_container" >
+    <div class="column items_per_page" >
+        Show
+        <select name="items_per_page" id="items_per_page" style="width:60px" onchange="paginate(<?php echo $this->page;?>)">
+            <option class="entry-option" value="10" <?php echo (($this->items_per_page==10)?('selected="true"'):(''));?>>10</option>
+            <option class="entry-option" value="25" <?php echo (($this->items_per_page==25)?('selected="true"'):(''));?>>25</option>
+            <option class="entry-option" value="50" <?php echo (($this->items_per_page==50)?('selected="true"'):(''));?>>50</option>
+            <option class="entry-option" value="100" <?php echo (($this->items_per_page==100)?('selected="true"'):(''));?>>100</option>
+        </select>
+        entries
+    </div>
+    <div class="column pages" >
+<?php
+if ($this->pages>1)
+{
+	if (isset($this->table_only_paginator) && ($this->table_only_paginator))
+	{?>
+			<ul class="table_only_paginitor">
+				<?php if ($this->page>2) {?>
+				<li class=""><button type="button" onclick="paginate(1)">1</button></li>
+				<?php } else
+				{?>
+				<li class="inactive">&nbsp;</li>		
+				<?php
+				}
+				if ($this->page>1) {?>
+				<li class="prev"><button type="button" onclick="paginate(<?php echo ($this->page-1);?>)"><i class="fa fa-chevron-left"></i></button></li>
+				<?php }
+				else {
+				?>
+				<li class="inactive"><i class="fa fa-chevron-left"></i></li>
+				<?php }?>
+				<li class="active"><?php echo $this->page;?></li>
+				<?php
+				if (($this->pages-$this->page)>1) {?>
+				<li class="next"><button type="button" onclick="paginate(<?php echo ($this->page+1);?>)"><i class="fa fa-chevron-right"></i></button></li>
+				<?php
+				} else {?>
+				<li class="inactive"><i class="fa fa-chevron-right"></i></li>
+				<?php
+				}?>
+				<?php
+				if (($this->pages-$this->page)>2) {?>
+				<li class="next"><button type="button" onclick="paginate(<?php echo $this->pages;?>)"><?php echo $this->pages;?></button></li>
+				<?php
+				} else {?>
+				<li class="inactive">&nbsp;</li>
+				<?php
+				}?>
+           </ul>
+    <?php
+	} else 
+	{
+		?>
+		<div align='center' class='paginator' style='' >
+		<input class='page_first first ' type='button' value='1' name='first' onclick='paginate(1)' align='center'></input> 
+		<?php
+		if ($this->page>2)
+		{?>
+			<input type='button'  value='<?php echo ($this->page-1);?>' name='prev_page' class='left ' onclick='paginate(<?php echo ($this->page-1);?>)' align='center'></input>
+		<?php
+		} else
+		{?>
+			<input type='button'  value='' name='page' class='left '  align='center'></input>
+		<?php
+		}?>
+		<input class='no_hover_effect center' type='button' disabled class='' value='<?php echo $this->page;?>'></input>
+		<?php
+		if ($this->page<$this->pages-1)
+		{?>
+			<input class='page_next right' type='button' name='next_page' align='center' value='<?php echo ($this->page+1);?>' onclick='paginate(<?php echo ($this->page+1);?>)' ></input>
+		<?php
+		} else
+		{?>
+			<input class='page_next right' type='button' name='page' align='center' value=''  ></input>
+		<?php
+		}?>    
+		<input type='button' class='page_last last ' value='<?php echo $this->pages;?>'  name='last_page' onclick='paginate(<?php echo $this->pages;?>)' align='center'></input>
+		<input type='hidden' page='1' name="current_page" />
+		</div>
+	<?php
+	}
+}?>
+    </div>
+    <div class="column items" >
+            <?php
+            $start = ($this->page-1)*$this->items_per_page + 1;
+            $end = $start+count($this->tasks)-1;
+            ?>
+            <div class="span5 dataTables_info" id="tableInfo">Showing <?php echo $start;?> to <?php echo $end;?> of <?php echo $this->total_db_items;?> entries</div>            
+    </div>
+</div>
+

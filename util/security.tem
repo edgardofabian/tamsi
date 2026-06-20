@@ -1,0 +1,8 @@
+
+    public $security;
+    
+    public function __construct($views)
+    {
+        $this->views = $views;
+        $this->security = new TamsiSecurity();
+    }

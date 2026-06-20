@@ -1,0 +1,15 @@
+    public function get[FOREIGN_FUNCTION_NAME]()
+    {
+        require_once '[FOREIGN_CLASS_NAME].php';
+        $[DATA]=$this->[DATA];
+		$[FOREIGN_TABLE_ELEMENT] = new [FOREIGN_CLASS_NAME](); 
+        $[FOREIGN_TABLE_ELEMENT]->find(array('id'=>$[DATA]));
+        if ($[FOREIGN_TABLE_ELEMENT]->getId()>0)
+        {
+            $this->[FOREIGN_NAME] = $[FOREIGN_TABLE_ELEMENT]->getName();
+        } else
+        {
+            $this->[FOREIGN_NAME] = "";
+        }
+        return $this->[FOREIGN_NAME];
+    }

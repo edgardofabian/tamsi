@@ -1,0 +1,11 @@
+        $[TABLE]_all = $[TABLE_ELEMENT]->findAll();
+        [SELECT_IDS_ARRAY]
+        foreach ($[TABLE]_all as $sample)
+        {
+            /*$field_id = $question->getFieldId();
+            $fieldIds[$field_id]=$field_id;
+            $level_id = $question->getLevelId();
+            $levelIds[$level_id]=$level_id;
+            $author_id = $question->getUserIdAuthor();
+            $authorIds[$author_id]=$author_id;*/
+        }

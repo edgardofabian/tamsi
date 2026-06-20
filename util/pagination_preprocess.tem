@@ -1,0 +1,28 @@
+        if (!($this->items_per_page)) $this->items_per_page = 25;
+        if (isset($_REQUEST['[TABLE_NAME]_items_per_page']))
+        {
+            $this->items_per_page = $_REQUEST['[TABLE_NAME]_items_per_page'];
+            $_SESSION['list_[TABLE_NAME]']['items_per_page']=$this->items_per_page;
+        } else
+        {
+            if (array_key_exists('list_[TABLE_NAME]',$_SESSION) && array_key_exists('items_per_page',$_SESSION['list_[TABLE_NAME]']))
+            {
+                $this->items_per_page = $_SESSION['list_[TABLE_NAME]']['items_per_page'];
+            }            
+        }
+        
+        $this->pages=$this->[TABLE_ELEMENT]->getPageCount($this->select_filters,$this->sort_filters,$this->items_per_page,true);
+        $this->total_db_items = $this->[TABLE_ELEMENT]->total_db_items;
+        $this->page = 1;//default to 1 in case not provided below
+        if (isset($_REQUEST['[TABLE_NAME]_page']))
+        {
+            $this->page = $_REQUEST['[TABLE_NAME]_page'];
+            $_SESSION['list_[TABLE_NAME]']['page']=$this->page;
+        } else
+        {
+            if (array_key_exists('list_[TABLE_NAME]',$_SESSION) && array_key_exists('page',$_SESSION['list_[TABLE_NAME]']))
+            {
+                $this->page = $_SESSION['list_[TABLE_NAME]']['page'];
+            }            
+        }
+        if (($this->page < 1) || ($this->page > $this->pages)) $this->page = 1;

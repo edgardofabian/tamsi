@@ -1,0 +1,9 @@
+{
+    "require": {
+        "thiagoalessio/tesseract_ocr": "^2.13",
+        "google/apiclient": "^2.18",
+        "pinoox/numera": "^1.1",
+        "firebase/php-jwt": "^6.11",
+        "brainfoolong/js-aes-php": "^1.0"
+    }
+}

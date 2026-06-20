@@ -1,0 +1,53 @@
+<?php 
+/**  
+ * Used to edit individual [CLASS_NAME]
+ * 
+ * Copyright (C) 20014-2020 Edgardo Fabian <edgardo.fabian@gmail.com> 
+ * LICENSE: This program is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU General Public License 
+ * as published by the Free Software Foundation; either version 3 
+ * of the License, or (at your option) any later version. 
+ * This program is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+ * GNU General Public License for more details. 
+ * You should have received a copy of the GNU General Public License 
+ * along with this program. If not, see <http://opensource.org/licenses/gpl-license.php>;. 
+ * @package tamsi
+ * @author Edgardo Fabian <edgardo.fabian@gmail.com> 
+ * @link https://tamsi.docph.net/
+ */
+require_once 'Role.php'; 
+if (!isset($allowed_edit)) $allowed_edit=array("admin");
+if (!isset($allowed)) $allowed=array("admin");
+$role = new Role();
+if (!$role->isUserAnyOf($allowed))
+{
+	$role->showUnauthorizedMessage($allowed,"?command=display_php&base_path=usr/view&path=Edit_[CLASS_NAME].rest.php");
+} else
+{
+if (!isset($[TABLE_ELEMENT]_view))
+{
+	require_once '[CLASS_NAME]View.php'; 
+	$[TABLE_ELEMENT]_view = new [CLASS_NAME]View(); 
+	$[TABLE_ELEMENT]_view->init_edit();
+}
+?> 
+
+[LINK_IMAGE]
+
+<form id="edit_[TABLE_ELEMENT]" <?php echo $[TABLE_ELEMENT]_view->edit_form_attributes;?> class="edit" action="?command=edit&object=[CLASS_NAME]&base_path=<?php echo $_REQUEST["base_path"];?>&path=<?php echo $path;?>" method="POST">
+<input class="field_pages" field_pages="1" type="hidden" value="1" name="pages" />
+<?php $[TABLE_ELEMENT]_view->renderCsrf();?> 
+<?php $[TABLE_ELEMENT]_view->renderCustomEdit();?> 
+<?php if ($role->isUserAnyOf($allowed_edit)) { $[TABLE_ELEMENT]_view->renderEditControls(); }?>
+<table class='odd_even_row_alternate_color full_width data' >
+[TABLE_CONTENT]
+</table>
+<div class="custom_widget">
+<?php if ($[TABLE_ELEMENT]_custom_widget) include "$[TABLE_ELEMENT]_custom_widget"; ?>
+</div>
+<?php if ($role->isUserAnyOf($allowed_edit)) { $[TABLE_ELEMENT]_view->renderEditControls(); }?>
+</form>
+<?php
+}?>

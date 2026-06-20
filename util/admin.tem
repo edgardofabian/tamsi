@@ -1,0 +1,8 @@
+<?php
+//Things that you can override
+// require_one '[CLASS_NAME]View.php';
+// $[TABLE_ELEMENT]_view = new [CLASS_NAME]View();
+/* [PROPS_COMMENT] */
+
+include $config->paths->app_path.'/usr/view/[TABLE]/[FILENAME]';
+

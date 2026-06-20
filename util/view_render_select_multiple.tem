@@ -1,0 +1,95 @@
+    public function render_[DATA]()
+    {
+        $sids_str=$this->[TABLE_ELEMENT]->get[DATA_FUNCTION_NAME]();
+        
+        $class='';
+        $attrs='';
+        $[TABLE_ELEMENT]_field='[DATA]';
+        foreach($this->columns[$[TABLE_ELEMENT]_field]['attributes'] as $name=>$value)
+        {
+            if ($name=='class')
+            {
+               $class.=' '.$value;
+            }
+            else
+            {
+               $attrs.=$name.'="'.$value.'" ';
+            }
+            
+        }
+        
+        if (($this->columns[$[TABLE_ELEMENT]_field]['type']=='hidden') || ($this->columns[$[TABLE_ELEMENT]_field]['type']=='readonly'))
+        {
+            echo "<input type='hidden' $attrs name='[DATA][]'  value='$sids_str' />";
+            if ($this->columns[$[TABLE_ELEMENT]_field]['type']=='readonly')
+            {
+                echo "<span >".$this->[TABLE_ELEMENT]->get[FOREIGN_ALIAS_FUNCTION_NAME]()."</span>";
+            }
+        } else
+        {
+            if ($this->columns[$[TABLE_ELEMENT]_field]['mode']=='edit')
+            {
+                echo "<select $attrs class='$class edit_input' [CUSTOM] name='[DATA][]' >\n";
+            } else
+            {
+                echo "<select $attrs class='$class' [CUSTOM] name='[DATA][]' >\n";
+            }
+            $selected_ids = array();
+            if ($sids_str)
+            {
+                $selected_ids = explode(",",$sids_str);
+            }
+            if (array_key_exists('[FILTER_FIELD]',$this->columns) && array_key_exists('options',$this->columns['[FILTER_FIELD]']) && ($this->columns['[FILTER_FIELD]']['options']))
+            {
+                $options = $this->columns['[FILTER_FIELD]']['options'];
+                foreach ($obptions as $option=>$label)
+                {
+                    if (in_array($option,$selected_ids))
+                    {
+                        echo "<option selected='selected' value='$option' >$label</option>\n";
+                        $data_names[] = $label;
+                    } else
+                    {
+                        echo "<option value='$option' >$label</option>\n";
+                    }
+                }                
+            } else
+            {
+                $[FOREIGN_ALIAS] = new [FOREIGN_TABLE_FUNCTION_NAME]();
+                $param = array();
+                if (array_key_exists('option_filters',$this->columns[$[TABLE_ELEMENT]_field]) && $this->columns[$[TABLE_ELEMENT]_field]['option_filters'])
+                {
+                    $param['filter'] = $this->columns[$[TABLE_ELEMENT]_field]['option_filters'];
+                }
+                if (array_key_exists('option_sort',$this->columns[$[TABLE_ELEMENT]_field]) && $this->columns[$[TABLE_ELEMENT]_field]['option_sort'])
+                {
+                    $param['sort'] = $this->columns[$[TABLE_ELEMENT]_field]['option_sort'];
+                }
+                if (array_key_exists('option_select',$this->columns[$[TABLE_ELEMENT]_field]) && $this->columns[$[TABLE_ELEMENT]_field]['option_select'])
+                {
+                    $param['select'] = $this->columns[$[TABLE_ELEMENT]_field]['option_select'];
+                }    
+                
+                $objs=$[FOREIGN_ALIAS]->getAll($param);
+                $data_names = array();
+                foreach ($objs as $option)
+                {
+                    $name = $option->getName();
+                    $oid = $option->getId();
+                    if ($oid)
+                    {
+                        if (in_array($oid,$selected_ids))
+                        {
+                            echo "<option selected='selected' value='$oid' >$name</option>\n";
+                            $data_names[] = $name;
+                        } else
+                        {
+                        echo "<option value='$oid' >$name</option>\n";
+                        }
+                    }
+                }
+            }
+            echo "</select>\n";
+            if ($this->columns[$[TABLE_ELEMENT]_field]['mode']=='edit') echo "<span class='view_input'>".implode(',',$data_names)."</span>";
+       }
+    }
